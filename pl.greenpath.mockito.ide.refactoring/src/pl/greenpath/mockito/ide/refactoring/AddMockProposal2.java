@@ -2,30 +2,26 @@ package pl.greenpath.mockito.ide.refactoring;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
-import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
-import org.eclipse.jdt.core.dom.rewrite.ImportRewrite.ImportRewriteContext;
-import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRewriteContext;
 import org.eclipse.jdt.ui.text.java.correction.ASTRewriteCorrectionProposal;
 
-@SuppressWarnings("restriction")
+import pl.greenpath.mockito.ide.refactoring.builder.FieldDeclarationBuilder;
+import pl.greenpath.mockito.ide.refactoring.builder.TypeSingleMemberAnnotationBuilder;
+
 public class AddMockProposal2 extends ASTRewriteCorrectionProposal {
 
+	private static final String MOCK = "org.mockito.Mock";
+	private static final String MOCKITO_JUNIT_RUNNER = "org.mockito.runners.MockitoJUnitRunner";
+	private static final String RUN_WITH = "org.junit.runner.RunWith";
 	private final ITypeBinding typeBinding;
 	private final SimpleName selectedNode;
 	private final CompilationUnit astRoot;
-	private final AstResolver astResolver;
-	private final BindingFinder bindingFinder;
+	private final BodyDeclaration methodBodyDeclaration;
 
 	public AddMockProposal2(String name, ICompilationUnit cu, SimpleName selectedNode, ITypeBinding typeBinding,
 			CompilationUnit astRoot) {
@@ -33,45 +29,32 @@ public class AddMockProposal2 extends ASTRewriteCorrectionProposal {
 		this.selectedNode = selectedNode;
 		this.typeBinding = typeBinding;
 		this.astRoot = astRoot;
-		astResolver = new AstResolver();
-		bindingFinder = new BindingFinder();
+		methodBodyDeclaration = new AstResolver().findParentBodyDeclaration(selectedNode);
 	}
 
 	@Override
 	protected ASTRewrite getRewrite() throws CoreException {
-		return createRewrite(createFieldDeclaration(createType()));
-	}
-
-	private ASTRewrite createRewrite(FieldDeclaration fieldDeclaration) {
-		ITypeBinding selectedNodeTypeBinding = bindingFinder.getParentTypeBinding(selectedNode);
-		ASTNode declaringNode = astRoot.findDeclaringNode(selectedNodeTypeBinding);
-		ChildListPropertyDescriptor property = astResolver.getBodyDeclarationsProperty(declaringNode);
-
 		ASTRewrite rewrite = ASTRewrite.create(selectedNode.getAST());
-		rewrite.getListRewrite(declaringNode, property).insertFirst(fieldDeclaration, null);
+		createImportRewrite(astRoot);
+		addMissingFieldDeclaration(rewrite);
+		addRunWithAnnotation(rewrite);
 		return rewrite;
 	}
 
-	@SuppressWarnings("restriction")
-	private Type createType() {
-		ImportRewrite imports = createImportRewrite(astRoot);
-		// TODO stop using ContextSensitiveImportRewriteContext since it's
-		// internal
-		ImportRewriteContext importRewriteContext = new ContextSensitiveImportRewriteContext(
-				astResolver.findParentBodyDeclaration(selectedNode), imports);
-		return imports.addImport(this.typeBinding, selectedNode.getAST(), importRewriteContext);
+	private void addRunWithAnnotation(ASTRewrite rewrite) {
+		new TypeSingleMemberAnnotationBuilder(new BindingFinder().getParentTypeBinding(methodBodyDeclaration), astRoot,
+				rewrite, getImportRewrite())
+				.withQualifiedName(RUN_WITH)
+				.withValue(MOCKITO_JUNIT_RUNNER)
+				.build();
 	}
 
-	@SuppressWarnings("unchecked")
-	private FieldDeclaration createFieldDeclaration(Type newType) {
-		AST ast = selectedNode.getAST();
-		VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
-		fragment.setName(ast.newSimpleName(selectedNode.getIdentifier()));
-
-		FieldDeclaration fieldDeclaration = ast.newFieldDeclaration(fragment);
-		fieldDeclaration.setType(newType);
-		fieldDeclaration.modifiers().add(ast.newModifier(ModifierKeyword.PRIVATE_KEYWORD));
-		return fieldDeclaration;
+	private void addMissingFieldDeclaration(ASTRewrite rewrite) {
+		new FieldDeclarationBuilder(selectedNode, methodBodyDeclaration, astRoot, rewrite, getImportRewrite())
+				.withType(typeBinding)
+				.withModifiers(ModifierKeyword.PRIVATE_KEYWORD)
+				.withMarkerAnnotation(MOCK)
+				.build();
 	}
 
 }
