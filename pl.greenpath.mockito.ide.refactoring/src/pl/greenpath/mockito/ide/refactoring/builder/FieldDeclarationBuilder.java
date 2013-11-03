@@ -16,8 +16,8 @@ import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite.ImportRewriteContext;
 import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRewriteContext;
 
-import pl.greenpath.mockito.ide.refactoring.AstResolver;
-import pl.greenpath.mockito.ide.refactoring.BindingFinder;
+import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
+import pl.greenpath.mockito.ide.refactoring.ast.BindingFinder;
 
 public class FieldDeclarationBuilder {
 

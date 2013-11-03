@@ -1,4 +1,4 @@
-package pl.greenpath.mockito.ide.refactoring;
+package pl.greenpath.mockito.ide.refactoring.ast;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;

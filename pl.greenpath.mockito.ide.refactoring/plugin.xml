@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.jdt.ui.quickFixProcessors">
       <quickFixProcessor
-            class="pl.greenpath.mockito.ide.refactoring.QuickFixProcessor1"
+            class="pl.greenpath.mockito.ide.refactoring.quickfix.MocksQuickFixProcessor"
             id="pl.greenpath.mockito.ide.refactoring.quickFixProcessor1">
       </quickFixProcessor>
    </extension>

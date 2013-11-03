@@ -10,6 +10,8 @@ import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.junit.Before;
 import org.junit.Test;
 
+import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
+
 public class AstResolverTest {
 
 	private AstResolver testedClass;
