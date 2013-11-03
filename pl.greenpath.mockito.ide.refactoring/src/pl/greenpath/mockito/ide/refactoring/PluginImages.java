@@ -15,11 +15,9 @@ public class PluginImages {
 
 	private static final IPath ICONS_PATH = new Path("/icons");
 	private static final ImageRegistry IMAGE_REGISTRY = new ImageRegistry();
-	private static final String NAME_PREFIX = "pl.greenpath.mockito.ide.refactoring.";
+	private static final String NAME_PREFIX= "org.eclipse.jdt.ui.";
 	private static final String T_OBJ = "obj16";
-
-	public static final String IMG_FIELD_PRIVATE = NAME_PREFIX + "field_private_obj.gif";
-	public static final ImageDescriptor DESC_FIELD_PRIVATE = createManagedFromKey(T_OBJ, IMG_FIELD_PRIVATE);
+	public static final ImageDescriptor DESC_FIELD_PRIVATE = createManagedFromKey(T_OBJ, ISharedImages.IMG_FIELD_PRIVATE);
 
 	static {
 		IMAGE_REGISTRY.put(ISharedImages.IMG_FIELD_PRIVATE, DESC_FIELD_PRIVATE);

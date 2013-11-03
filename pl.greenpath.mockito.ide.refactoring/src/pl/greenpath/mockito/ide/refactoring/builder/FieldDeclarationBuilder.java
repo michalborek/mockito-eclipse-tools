@@ -31,8 +31,8 @@ public class FieldDeclarationBuilder {
 	private final CompilationUnit parentClass;
 	private final ImportRewriteContext importRewriteContext;
 
-	public FieldDeclarationBuilder(SimpleName selectedNode, BodyDeclaration parentClassBody, CompilationUnit parentClass, ASTRewrite rewrite,
-			ImportRewrite importRewrite) {
+	public FieldDeclarationBuilder(final SimpleName selectedNode, final BodyDeclaration parentClassBody, final CompilationUnit parentClass, final ASTRewrite rewrite,
+			final ImportRewrite importRewrite) {
 		this.parentClass = parentClass;
 		ast = selectedNode.getAST();
 		this.selectedNode = selectedNode;
@@ -45,40 +45,40 @@ public class FieldDeclarationBuilder {
 	}
 
 	public void build() {
-		ASTNode declaringNode = parentClass.findDeclaringNode(bindingFinder.getParentTypeBinding(selectedNode));
+		final ASTNode declaringNode = parentClass.findDeclaringNode(bindingFinder.getParentTypeBinding(selectedNode));
 		rewrite.getListRewrite(declaringNode, astResolver.getBodyDeclarationsProperty(declaringNode)).insertFirst(
 				fieldDeclaration, null);
 	}
 
 	private FieldDeclaration createFieldDeclaration() {
-		VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
+		final VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
 		fragment.setName(ast.newSimpleName(selectedNode.getIdentifier()));
 		return ast.newFieldDeclaration(fragment);
 	}
 
-	public FieldDeclarationBuilder withType(ITypeBinding typeBinding) {
-		Type type = importRewrite.addImport(typeBinding, selectedNode.getAST(), importRewriteContext);
+	public FieldDeclarationBuilder withType(final ITypeBinding typeBinding) {
+		final Type type = importRewrite.addImport(typeBinding, selectedNode.getAST(), importRewriteContext);
 		fieldDeclaration.setType(type);
 		return this;
 	}
 
 	@SuppressWarnings("unchecked")
-	public FieldDeclarationBuilder withModifiers(ModifierKeyword... modifiers) {
-		for (ModifierKeyword modifierKeyword : modifiers) {
+	public FieldDeclarationBuilder withModifiers(final ModifierKeyword... modifiers) {
+		for (final ModifierKeyword modifierKeyword : modifiers) {
 			fieldDeclaration.modifiers().add(ast.newModifier(modifierKeyword));
 		}
 		return this;
 	}
 
-	public FieldDeclarationBuilder withMarkerAnnotation(String fullyQualifiedName) {
-		MarkerAnnotation annotation = ast.newMarkerAnnotation();
+	public FieldDeclarationBuilder withMarkerAnnotation(final String fullyQualifiedName) {
+		final MarkerAnnotation annotation = ast.newMarkerAnnotation();
 		annotation.setTypeName(ast.newSimpleName(addImport(fullyQualifiedName)));
 		rewrite.getListRewrite(fieldDeclaration, FieldDeclaration.MODIFIERS2_PROPERTY)
 				.insertFirst(annotation, null);
 		return this;
 	}
 
-	private String addImport(String fullyQualifiedName) {
+	private String addImport(final String fullyQualifiedName) {
 		return importRewrite.addImport(fullyQualifiedName, importRewriteContext);
 	}
 
