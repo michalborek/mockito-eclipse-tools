@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="pl.greenpath.eclipse.refactoring"
+      label="Eclipse Refactoring Tools"
+      version="1.0.0.qualifier"
+      provider-name="Michal Borek">
+
+   <description url="https://github.com/michalborek/mockito-eclipse-tools">
+      Eclipse plugin that simplifies test creation by providing refactorings for Mockito mocks.
+   </description>
+
+   <copyright>
+      When using this code please mention about an author.
+   </copyright>
+
+   <license url="http://www.eclipse.org/legal/epl-v10.html">
+      Distributed under Eclipse Public License version 1.0
+   </license>
+
+   <url>
+      <discovery label="My Blog" url="http://greenpath.pl"/>
+      <discovery label="My projects on GitHub" url="http://github.com/michalborek"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.jdt.ui"/>
+      <import plugin="org.eclipse.jdt.core"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ltk.core.refactoring"/>
+   </requires>
+
+   <plugin
+         id="pl.greenpath.mockito.ide.refactoring"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
