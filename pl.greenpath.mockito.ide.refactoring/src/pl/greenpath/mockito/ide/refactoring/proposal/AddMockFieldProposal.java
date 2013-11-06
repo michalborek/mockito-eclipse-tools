@@ -34,7 +34,7 @@ public class AddMockFieldProposal extends ASTRewriteCorrectionProposal {
 		this.selectedNode = selectedNode;
 		this.typeBinding = typeBinding;
 		this.astRoot = astRoot;
-		methodBodyDeclaration = new AstResolver().findParentBodyDeclaration(selectedNode);
+		methodBodyDeclaration = new AstResolver().findParentMethodBodyDeclaration(selectedNode);
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class AddMockFieldProposal extends ASTRewriteCorrectionProposal {
 	@Override
 	public int getRelevance() {
 		if (selectedNode.getIdentifier().toLowerCase().endsWith("mock")) {
-			return 100;
+			return 98;
 		}
 		return super.getRelevance();
 	}

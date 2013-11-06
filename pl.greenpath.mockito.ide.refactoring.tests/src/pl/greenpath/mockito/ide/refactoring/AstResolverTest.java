@@ -24,7 +24,7 @@ public class AstResolverTest {
 	@Test
 	public void shouldFindParentBodyDeclarationWhenGivenBodyDeclaration() {
 		BodyDeclaration nodeMock = mock(BodyDeclaration.class);
-		BodyDeclaration result = testedClass.findParentBodyDeclaration(nodeMock);
+		BodyDeclaration result = testedClass.findParentMethodBodyDeclaration(nodeMock);
 
 		assertThat(result, is(equalTo(nodeMock)));
 	}
@@ -32,7 +32,7 @@ public class AstResolverTest {
 	@Test
 	public void shouldBeNullForNull() {
 		BodyDeclaration nodeMock = null;
-		BodyDeclaration result = testedClass.findParentBodyDeclaration(nodeMock);
+		BodyDeclaration result = testedClass.findParentMethodBodyDeclaration(nodeMock);
 		
 		assertThat(result, is(nullValue()));
 	}

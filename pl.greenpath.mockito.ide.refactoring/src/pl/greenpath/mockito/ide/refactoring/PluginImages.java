@@ -18,9 +18,11 @@ public class PluginImages {
 	private static final String NAME_PREFIX= "org.eclipse.jdt.ui.";
 	private static final String T_OBJ = "obj16";
 	public static final ImageDescriptor DESC_FIELD_PRIVATE = createManagedFromKey(T_OBJ, ISharedImages.IMG_FIELD_PRIVATE);
+	public static final ImageDescriptor DESC_LOCAL_VARIABLE = createManagedFromKey(T_OBJ, ISharedImages.IMG_OBJS_LOCAL_VARIABLE);
 
 	static {
 		IMAGE_REGISTRY.put(ISharedImages.IMG_FIELD_PRIVATE, DESC_FIELD_PRIVATE);
+		IMAGE_REGISTRY.put(ISharedImages.IMG_OBJS_LOCAL_VARIABLE, DESC_LOCAL_VARIABLE);
 	}
 
 	public static ImageRegistry getImageRegistry() {

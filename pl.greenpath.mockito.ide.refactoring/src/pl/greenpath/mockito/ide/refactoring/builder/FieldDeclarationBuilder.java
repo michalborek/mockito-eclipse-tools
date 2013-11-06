@@ -73,13 +73,13 @@ public class FieldDeclarationBuilder {
 
     public FieldDeclarationBuilder withMarkerAnnotation(final String fullyQualifiedName) {
         final MarkerAnnotation annotation = ast.newMarkerAnnotation();
-        annotation.setTypeName(ast.newSimpleName(addImport(fullyQualifiedName)));
+        annotation.setTypeName(ast.newSimpleName(importType(fullyQualifiedName)));
         rewrite.getListRewrite(fieldDeclaration, FieldDeclaration.MODIFIERS2_PROPERTY)
                 .insertFirst(annotation, null);
         return this;
     }
 
-    private String addImport(final String fullyQualifiedName) {
-        return importRewrite.addImport(fullyQualifiedName, importRewriteContext);
+    private String importType(final String qualifiedName) {
+        return importRewrite.addImport(qualifiedName, importRewriteContext);
     }
 }

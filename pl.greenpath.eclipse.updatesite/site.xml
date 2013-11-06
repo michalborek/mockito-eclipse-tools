@@ -3,5 +3,5 @@
    <description name="Eclipse Tools" url="http://eclipse.greenpath.pl">
       Refactoring tools for Eclipse
    </description>
-   <feature url="features/pl.greenpath.eclipse.refactoring_1.0.0.201311031824.jar" id="pl.greenpath.eclipse.refactoring" version="1.0.0.201311031824"/>
+   <feature url="features/pl.greenpath.eclipse.refactoring_1.0.0.201311042224.jar" id="pl.greenpath.eclipse.refactoring" version="1.0.0.201311042224"/>
 </site>
