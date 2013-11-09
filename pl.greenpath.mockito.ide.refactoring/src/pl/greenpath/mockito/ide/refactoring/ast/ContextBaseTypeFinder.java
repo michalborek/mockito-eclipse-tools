@@ -50,9 +50,9 @@ public class ContextBaseTypeFinder {
     public ITypeBinding find() throws NotSupportedRefactoring {
         switch (_parent.getNodeType()) {
         case ASTNode.CLASS_INSTANCE_CREATION:
-            return getProposedType(getIndexOfParameterInMethodInvocation(), (ClassInstanceCreation) _parent);
+            return getProposedType((ClassInstanceCreation) _parent);
         case ASTNode.METHOD_INVOCATION:
-            return getProposedType(getIndexOfParameterInMethodInvocation(), (MethodInvocation) _parent);
+            return getProposedType((MethodInvocation) _parent);
         case ASTNode.ARRAY_INITIALIZER:
             return getProposedType((ArrayInitializer) _parent);
         case ASTNode.ASSIGNMENT:
@@ -75,12 +75,12 @@ public class ContextBaseTypeFinder {
         return (List) _selectedExpression.getParent().getStructuralProperty(_selectedExpression.getLocationInParent());
     }
 
-    private ITypeBinding getProposedType(final int index, final MethodInvocation parent) {
-        return getTypeFromBinding(index, parent.resolveMethodBinding());
+    private ITypeBinding getProposedType(final MethodInvocation parent) {
+        return getTypeFromBinding(parent.resolveMethodBinding());
     }
 
-    private ITypeBinding getProposedType(final int index, final ClassInstanceCreation parent) {
-        return getTypeFromBinding(index, parent.resolveConstructorBinding());
+    private ITypeBinding getProposedType(final ClassInstanceCreation parent) {
+        return getTypeFromBinding(parent.resolveConstructorBinding());
     }
 
     private ITypeBinding getProposedType(final ArrayInitializer parent) {
@@ -99,7 +99,7 @@ public class ContextBaseTypeFinder {
         return parent.resolveBinding().getType();
     }
 
-    private ITypeBinding getTypeFromBinding(final int index, final IMethodBinding binding) {
-        return binding.getParameterTypes()[index];
+    private ITypeBinding getTypeFromBinding(final IMethodBinding binding) {
+        return binding.getParameterTypes()[getIndexOfParameterInMethodInvocation()];
     }
 }
