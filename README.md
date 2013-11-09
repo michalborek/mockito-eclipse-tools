@@ -10,6 +10,11 @@ Eclipse plugin that simplifies test creation by providing refactorings for Mocki
 
 TBD.
 
+## Screenshots
+
+![](https://raw.github.com/michalborek/mockito-eclipse-tools/master/screenshot.png)
+
+
 ## Downloads
 Mockito Quick-Fix Tool in Alpha version is available via Eclipse Marketplace 
 
