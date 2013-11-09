@@ -1,6 +1,8 @@
 package pl.greenpath.mockito.ide.refactoring.builder;
 
 import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -10,7 +12,6 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
@@ -49,11 +50,11 @@ public class LocalMockInitializationDeclarationBuilder {
                 null);
     }
 
-    private VariableDeclarationExpression createVariable(final Type typeName) {
+    private VariableDeclarationExpression createVariable(final Type type) {
         final VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
         fragment.setName(ast.newSimpleName(selectedNode.getIdentifier()));
         final VariableDeclarationExpression variable = ast.newVariableDeclarationExpression(fragment);
-        variable.setType(typeName);
+        variable.setType((Type) ASTNode.copySubtree(ast, getTypeForDeclaration(type)));
         return variable;
     }
 
@@ -63,37 +64,43 @@ public class LocalMockInitializationDeclarationBuilder {
         return this;
     }
 
-    private Assignment createMockAssignment(final Type typeName) {
+    private Assignment createMockAssignment(final Type type) {
         final Assignment result = ast.newAssignment();
-        result.setLeftHandSide(createVariable(typeName));
-        result.setRightHandSide(createMockMethodInvocation(typeName));
+        result.setLeftHandSide(createVariable(type));
+        result.setRightHandSide(createMockMethodInvocation(type));
         return result;
     }
 
     @SuppressWarnings("unchecked")
-    private MethodInvocation createMockMethodInvocation(final Type typeName) {
+    private MethodInvocation createMockMethodInvocation(final Type type) {
         final MethodInvocation result = ast.newMethodInvocation();
         result.setName(ast.newSimpleName(MOCK_METHOD_NAME));
-        result.arguments().add(getTypeLiteral(typeName));
+        result.arguments().add(getTypeLiteral(type));
         return result;
     }
 
     private TypeLiteral getTypeLiteral(final Type type) {
         final TypeLiteral result = ast.newTypeLiteral();
-        result.setType(ast.newSimpleType(ast.newSimpleName(getTypeName(type))));
+        result.setType((Type) ASTNode.copySubtree(ast, getTypeForTypeLiteral(type)));
         return result;
     }
 
-    private String getTypeName(final Type type) {
-        final SimpleType simpleType;
-        if (type.isParameterizedType()) {
-            simpleType = (SimpleType) ((ParameterizedType) type).getType();
-        } else if (type.isSimpleType()) {
-            simpleType = (SimpleType) type;
-        } else {
-            throw new IllegalArgumentException("Type: " + type.getClass() + " is not supported");
+    public Type getTypeForDeclaration(final Type type) {
+        if (type.isArrayType()) {
+            return ((ArrayType) type).getComponentType();
         }
-        return simpleType.getName().getFullyQualifiedName();
+        return type;
+    }
+
+    private Type getTypeForTypeLiteral(final Type type) {
+        if (type.isParameterizedType()) {
+            return ((ParameterizedType) type).getType();
+        } else if (type.isSimpleType()) {
+            return type;
+        } else if (type.isArrayType()) {
+            return ((ArrayType) type).getComponentType();
+        }
+        throw new IllegalArgumentException("Type: " + type.getClass() + " is not supported");
     }
 
     private Type importType(final ITypeBinding typeBinding) {

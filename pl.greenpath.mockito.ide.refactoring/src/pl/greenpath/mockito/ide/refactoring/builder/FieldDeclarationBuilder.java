@@ -30,6 +30,7 @@ public class FieldDeclarationBuilder {
     private final BindingFinder bindingFinder;
     private final CompilationUnit parentClass;
     private final ImportRewriteContext importRewriteContext;
+    private MarkerAnnotation annotation;
 
     public FieldDeclarationBuilder(final SimpleName selectedNode, final BodyDeclaration parentClassBody,
             final CompilationUnit parentClass, final ASTRewrite rewrite,
@@ -49,6 +50,8 @@ public class FieldDeclarationBuilder {
         final ASTNode declaringNode = parentClass.findDeclaringNode(bindingFinder.getParentTypeBinding(selectedNode));
         rewrite.getListRewrite(declaringNode, astResolver.getBodyDeclarationsProperty(declaringNode)).insertFirst(
                 fieldDeclaration, null);
+        rewrite.getListRewrite(fieldDeclaration, FieldDeclaration.MODIFIERS2_PROPERTY)
+                .insertFirst(annotation, null);
     }
 
     private FieldDeclaration createFieldDeclaration() {
@@ -72,10 +75,8 @@ public class FieldDeclarationBuilder {
     }
 
     public FieldDeclarationBuilder withMarkerAnnotation(final String fullyQualifiedName) {
-        final MarkerAnnotation annotation = ast.newMarkerAnnotation();
+        annotation = ast.newMarkerAnnotation();
         annotation.setTypeName(ast.newSimpleName(importType(fullyQualifiedName)));
-        rewrite.getListRewrite(fieldDeclaration, FieldDeclaration.MODIFIERS2_PROPERTY)
-                .insertFirst(annotation, null);
         return this;
     }
 

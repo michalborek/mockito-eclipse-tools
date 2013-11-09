@@ -1,6 +1,8 @@
 package pl.greenpath.mockito.ide.refactoring.quickfix;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -26,21 +28,39 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
         final List<IJavaCompletionProposal> corrections = new ArrayList<IJavaCompletionProposal>();
 
         for (final IProblemLocation location : locations) {
-            if (hasCorrections(context.getCompilationUnit(), location.getProblemId())) {
-                addProposals(context, corrections, location);
+            if (isUnresolvedVariable(location.getProblemId())) {
+                corrections.addAll(getMockCreationProposals(context, location));
+            } else if (isLocalMockDefinition(context)) {
+                corrections.add(getMockConversionProposal(context, location));
             }
         }
         return corrections.toArray(new IJavaCompletionProposal[0]);
     }
 
-    private void addProposals(final IInvocationContext context, final List<IJavaCompletionProposal> corrections,
+    private IJavaCompletionProposal getMockConversionProposal(final IInvocationContext context,
+            final IProblemLocation location) {
+        return null; // TODO
+    }
+
+    private boolean isLocalMockDefinition(final IInvocationContext context) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    private boolean isUnresolvedVariable(final int problemId) {
+        return problemId == IProblem.UnresolvedVariable;
+    }
+
+    private List<IJavaCompletionProposal> getMockCreationProposals(final IInvocationContext context,
             final IProblemLocation location) {
         try {
-            corrections.add(getAddFieldMockProposal(context, location));
-            corrections.add(getAddLocalMockProposal(context, location));
+            return Arrays.asList(
+                    getAddFieldMockProposal(context, location),
+                    getAddLocalMockProposal(context, location));
         } catch (final NotSupportedRefactoring e) {
             // TODO logging
             e.printStackTrace();
+            return Collections.emptyList();
         }
     }
 
@@ -67,8 +87,7 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
 
     @Override
     public boolean hasCorrections(final ICompilationUnit unit, final int problemId) {
-        return problemId == IProblem.UnresolvedVariable
-                && unit.findPrimaryType().getElementName().endsWith("Test");
+        return unit.findPrimaryType().getElementName().endsWith("Test");
     }
 
 }
