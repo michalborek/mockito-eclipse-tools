@@ -21,8 +21,8 @@ public class TypeSingleMemberAnnotationBuilder {
 	private final SingleMemberAnnotation annotation;
 	private final AST ast;
 
-	public TypeSingleMemberAnnotationBuilder(ITypeBinding typeBinding, CompilationUnit astRoot,
-			ASTRewrite rewrite, ImportRewrite importRewrite) {
+	public TypeSingleMemberAnnotationBuilder(final ITypeBinding typeBinding, final CompilationUnit astRoot,
+			final ASTRewrite rewrite, final ImportRewrite importRewrite) {
 		this.astRoot = astRoot;
 		this.rewrite = rewrite;
 		this.typeBinding = typeBinding;
@@ -31,35 +31,35 @@ public class TypeSingleMemberAnnotationBuilder {
 		annotation = ast.newSingleMemberAnnotation();
 	}
 
-	public TypeSingleMemberAnnotationBuilder withQualifiedName(String qualifiedName) {
+	public TypeSingleMemberAnnotationBuilder setQualifiedName(final String qualifiedName) {
 		annotation.setTypeName(ast.newName(addImport(qualifiedName)));
 		return this;
 	}
 
-	public TypeSingleMemberAnnotationBuilder withValue(String value) {
-		TypeLiteral member = ast.newTypeLiteral();
+	public TypeSingleMemberAnnotationBuilder setValue(final String value) {
+		final TypeLiteral member = ast.newTypeLiteral();
 		member.setType(ast.newSimpleType(ast.newSimpleName(addImport(value))));
 		annotation.setValue(member);
 		return this;
 	}
 
-	private String addImport(String importDefinition) {
-		ContextSensitiveImportRewriteContext importRewriteContext = new ContextSensitiveImportRewriteContext(
-				astRoot, importRewrite);
-		return importRewrite.addImport(importDefinition, importRewriteContext);
+	private String addImport(final String importDefinition) {
+		final ContextSensitiveImportRewriteContext context = 
+		        new ContextSensitiveImportRewriteContext(astRoot, importRewrite);
+		return importRewrite.addImport(importDefinition, context);
 	}
 
 	public void build() {
 		if (!containsAnnotation(annotation)) {
-			ASTNode typeNode = astRoot.findDeclaringNode(typeBinding);
+			final ASTNode typeNode = astRoot.findDeclaringNode(typeBinding);
 			rewrite.getListRewrite(typeNode, TypeDeclaration.MODIFIERS2_PROPERTY)
 					.insertFirst(annotation, null);
 		}
 	}
 
-	private boolean containsAnnotation(SingleMemberAnnotation annotation) {
+	private boolean containsAnnotation(final SingleMemberAnnotation annotation) {
 		// TODO what about complex refactorings?
-		for (IAnnotationBinding node : typeBinding.getAnnotations()) {
+		for (final IAnnotationBinding node : typeBinding.getAnnotations()) {
 			if (node.getName().equals(annotation.getTypeName().getFullyQualifiedName())) {
 				return true;
 			}

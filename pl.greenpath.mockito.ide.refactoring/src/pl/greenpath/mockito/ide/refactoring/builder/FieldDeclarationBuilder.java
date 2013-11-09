@@ -60,21 +60,21 @@ public class FieldDeclarationBuilder {
         return ast.newFieldDeclaration(fragment);
     }
 
-    public FieldDeclarationBuilder withType(final ITypeBinding typeBinding) {
+    public FieldDeclarationBuilder setType(final ITypeBinding typeBinding) {
         final Type type = importRewrite.addImport(typeBinding, selectedNode.getAST(), importRewriteContext);
         fieldDeclaration.setType(type);
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public FieldDeclarationBuilder withModifiers(final ModifierKeyword... modifiers) {
+    public FieldDeclarationBuilder setModifiers(final ModifierKeyword... modifiers) {
         for (final ModifierKeyword modifierKeyword : modifiers) {
             fieldDeclaration.modifiers().add(ast.newModifier(modifierKeyword));
         }
         return this;
     }
 
-    public FieldDeclarationBuilder withMarkerAnnotation(final String fullyQualifiedName) {
+    public FieldDeclarationBuilder setMarkerAnnotation(final String fullyQualifiedName) {
         annotation = ast.newMarkerAnnotation();
         annotation.setTypeName(ast.newSimpleName(importType(fullyQualifiedName)));
         return this;

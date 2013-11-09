@@ -42,7 +42,7 @@ public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
 
     private void addMissingVariableDeclaration(final ASTRewrite rewrite) {
         new LocalMockInitializationDeclarationBuilder(selectedNode, methodDeclaration, astRoot, rewrite, getImportRewrite()).
-                withMethodInvocation(typeBinding).build();
+                setMockMethodInvocation(typeBinding).build();
     }
 
     @Override

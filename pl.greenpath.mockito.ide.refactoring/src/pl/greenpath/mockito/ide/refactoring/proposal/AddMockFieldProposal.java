@@ -49,16 +49,16 @@ public class AddMockFieldProposal extends ASTRewriteCorrectionProposal {
 	private void addRunWithAnnotation(final ASTRewrite rewrite) {
 		new TypeSingleMemberAnnotationBuilder(new BindingFinder().getParentTypeBinding(methodBodyDeclaration), astRoot,
 				rewrite, getImportRewrite())
-				.withQualifiedName(RUN_WITH)
-				.withValue(MOCKITO_JUNIT_RUNNER)
+				.setQualifiedName(RUN_WITH)
+				.setValue(MOCKITO_JUNIT_RUNNER)
 				.build();
 	}
 
 	private void addMissingFieldDeclaration(final ASTRewrite rewrite) {
 		new FieldDeclarationBuilder(selectedNode, methodBodyDeclaration, astRoot, rewrite, getImportRewrite())
-				.withType(typeBinding)
-				.withModifiers(ModifierKeyword.PRIVATE_KEYWORD)
-				.withMarkerAnnotation(MOCK)
+				.setType(typeBinding)
+				.setModifiers(ModifierKeyword.PRIVATE_KEYWORD)
+				.setMarkerAnnotation(MOCK)
 				.build();
 	}
 

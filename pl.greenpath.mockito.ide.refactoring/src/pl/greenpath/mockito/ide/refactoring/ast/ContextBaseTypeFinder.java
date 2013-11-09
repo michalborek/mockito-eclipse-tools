@@ -84,7 +84,7 @@ public class ContextBaseTypeFinder {
     }
 
     private ITypeBinding getProposedType(final ArrayInitializer parent) {
-        return parent.resolveTypeBinding();
+        return parent.resolveTypeBinding().getComponentType();
     }
 
     private ITypeBinding getProposedType(final Assignment parent) {

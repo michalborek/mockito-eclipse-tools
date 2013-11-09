@@ -2,7 +2,6 @@ package pl.greenpath.mockito.ide.refactoring.builder;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -54,11 +53,11 @@ public class LocalMockInitializationDeclarationBuilder {
         final VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
         fragment.setName(ast.newSimpleName(selectedNode.getIdentifier()));
         final VariableDeclarationExpression variable = ast.newVariableDeclarationExpression(fragment);
-        variable.setType((Type) ASTNode.copySubtree(ast, getTypeForDeclaration(type)));
+        variable.setType((Type) ASTNode.copySubtree(ast, type));
         return variable;
     }
 
-    public LocalMockInitializationDeclarationBuilder withMethodInvocation(final ITypeBinding typeBinding) {
+    public LocalMockInitializationDeclarationBuilder setMockMethodInvocation(final ITypeBinding typeBinding) {
         importStaticMethod(MOCKITO_PACKAGE, MOCK_METHOD_NAME);
         initLocalMockExpression = ast.newExpressionStatement(createMockAssignment(importType(typeBinding)));
         return this;
@@ -85,22 +84,12 @@ public class LocalMockInitializationDeclarationBuilder {
         return result;
     }
 
-    public Type getTypeForDeclaration(final Type type) {
-        if (type.isArrayType()) {
-            return ((ArrayType) type).getComponentType();
-        }
-        return type;
-    }
-
     private Type getTypeForTypeLiteral(final Type type) {
         if (type.isParameterizedType()) {
             return ((ParameterizedType) type).getType();
-        } else if (type.isSimpleType()) {
+        } else {
             return type;
-        } else if (type.isArrayType()) {
-            return ((ArrayType) type).getComponentType();
         }
-        throw new IllegalArgumentException("Type: " + type.getClass() + " is not supported");
     }
 
     private Type importType(final ITypeBinding typeBinding) {
