@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import pl.greenpath.mockito.ide.refactoring.proposal.AddLocalMockProposal;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
 public class AddLocalMockProposalTest {
@@ -82,6 +81,42 @@ public class AddLocalMockProposalTest {
         assertThat(rightSide.getName().getIdentifier()).isEqualTo("mock");
         assertThat(((SimpleType)((TypeLiteral)rightSide.arguments().get(0)).getType()).getName().getFullyQualifiedName()).isEqualTo("String");
     }
+    
+    @Test
+    public void shouldReturnHighRelevanceWhenVariableEndsWithMock() {
+        final MethodDeclaration aMethod = _type.getMethods()[0];
+        final ExpressionStatement invocationStatement = (ExpressionStatement) aMethod.getBody().statements().get(0);
+        final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
+        final SimpleName selectedNode = (SimpleName) bMethodInvocation.arguments().get(0);
+        
+        final AddLocalMockProposal testedClass = new AddLocalMockProposal(_cu, selectedNode, _astCu);
+        
+        assertThat(testedClass.getRelevance()).isEqualTo(99);
+    }
+
+    @Test
+    public void shouldReturnLowRelevanceWhenVariableDoesntEndsWithMock() {
+        final MethodDeclaration aMethod = _type.getMethods()[7];
+        final ExpressionStatement invocationStatement = (ExpressionStatement) aMethod.getBody().statements().get(0);
+        final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
+        final SimpleName selectedNode = (SimpleName) bMethodInvocation.arguments().get(0);
+        
+        final AddLocalMockProposal testedClass = new AddLocalMockProposal(_cu, selectedNode, _astCu);
+        
+        assertThat(testedClass.getRelevance()).isLessThan(90);
+    }
+    
+    @Test
+    public void imageShouldNotBeNull() {
+        final MethodDeclaration aMethod = _type.getMethods()[7];
+        final ExpressionStatement invocationStatement = (ExpressionStatement) aMethod.getBody().statements().get(0);
+        final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
+        final SimpleName selectedNode = (SimpleName) bMethodInvocation.arguments().get(0);
+        
+        final AddLocalMockProposal testedClass = new AddLocalMockProposal(_cu, selectedNode, _astCu);
+        
+        assertThat(testedClass.getImage()).isNotNull();
+    }
 
     public static ICompilationUnit createCompilationUnit() throws CoreException, JavaModelException {
         final IPackageFragment packageFragment = _sourceFolder.createPackageFragment("test1", false, null);
@@ -96,6 +131,7 @@ public class AddLocalMockProposalTest {
         buf.append("    public void e() { int[] arr = new int[2]; arr[0] = test3Mock;  }\n");
         buf.append("    public String f() { return test4Mock;  }\n");
         buf.append("    public void g() { long t = test4Mock;  }\n");
+        buf.append("    public void h() { b(test);  }\n");
         buf.append("}\n");
         return packageFragment.createCompilationUnit("A.java", buf.toString(), false, null);
     }
