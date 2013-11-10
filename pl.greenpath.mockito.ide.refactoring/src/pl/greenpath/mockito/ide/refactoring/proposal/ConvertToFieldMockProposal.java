@@ -55,7 +55,7 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
 	}
 
 	private void addMissingFieldDeclaration(final ASTRewrite rewrite) {
-		new FieldDeclarationBuilder(selectedNode, methodBodyDeclaration, astRoot, rewrite, getImportRewrite())
+		new FieldDeclarationBuilder(selectedNode, astRoot, rewrite, getImportRewrite())
 				.setType(typeBinding)
 				.setModifiers(ModifierKeyword.PRIVATE_KEYWORD)
 				.setMarkerAnnotation(MOCK)

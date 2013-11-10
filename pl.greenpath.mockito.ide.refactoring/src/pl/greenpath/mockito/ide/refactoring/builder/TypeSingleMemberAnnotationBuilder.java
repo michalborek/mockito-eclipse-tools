@@ -44,8 +44,7 @@ public class TypeSingleMemberAnnotationBuilder {
 	}
 
 	private String addImport(final String importDefinition) {
-		final ContextSensitiveImportRewriteContext context = 
-		        new ContextSensitiveImportRewriteContext(astRoot, importRewrite);
+		final ContextSensitiveImportRewriteContext context = new ContextSensitiveImportRewriteContext(astRoot, importRewrite);
 		return importRewrite.addImport(importDefinition, context);
 	}
 

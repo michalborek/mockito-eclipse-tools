@@ -15,7 +15,6 @@ import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IQuickFixProcessor;
 
-import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
 import pl.greenpath.mockito.ide.refactoring.proposal.AddLocalMockProposal;
 import pl.greenpath.mockito.ide.refactoring.proposal.AddMockFieldProposal;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
@@ -80,8 +79,7 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
         if (selectedNode.getNodeType() != ASTNode.SIMPLE_NAME) {
             throw new NotSupportedRefactoring("This selection is not supported by this refactoring");
         }
-        return new AddMockFieldProposal(context.getCompilationUnit(), (SimpleName) selectedNode,
-                new ContextBaseTypeFinder((SimpleName) selectedNode).find(), context.getASTRoot());
+        return new AddMockFieldProposal(context.getCompilationUnit(), (SimpleName) selectedNode, context.getASTRoot());
     }
 
     @Override

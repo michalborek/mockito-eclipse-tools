@@ -2,7 +2,6 @@ package pl.greenpath.mockito.ide.refactoring.builder;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -32,8 +31,7 @@ public class FieldDeclarationBuilder {
     private final ImportRewriteContext importRewriteContext;
     private MarkerAnnotation annotation;
 
-    public FieldDeclarationBuilder(final SimpleName selectedNode, final BodyDeclaration parentClassBody,
-            final CompilationUnit parentClass, final ASTRewrite rewrite,
+    public FieldDeclarationBuilder(final SimpleName selectedNode, final CompilationUnit parentClass, final ASTRewrite rewrite,
             final ImportRewrite importRewrite) {
         this.parentClass = parentClass;
         ast = selectedNode.getAST();
@@ -43,7 +41,7 @@ public class FieldDeclarationBuilder {
         astResolver = new AstResolver();
         bindingFinder = new BindingFinder();
         fieldDeclaration = createFieldDeclaration();
-        importRewriteContext = new ContextSensitiveImportRewriteContext(parentClassBody, importRewrite);
+        importRewriteContext = new ContextSensitiveImportRewriteContext(selectedNode, importRewrite);
     }
 
     public void build() {
