@@ -1,4 +1,4 @@
-package pl.greenpath.mockito.ide.refactoring.builder;
+package pl.greenpath.mockito.ide.refactoring.proposal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,9 +25,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
-import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
-import org.eclipse.jdt.internal.corext.codemanipulation.StubUtility;
 import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.eclipse.jdt.testplugin.JavaProjectHelper;
 import org.junit.AfterClass;
@@ -35,10 +32,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
+import pl.greenpath.mockito.ide.refactoring.proposal.AddLocalMockProposal;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
-public class LocalMockInitializationDeclarationBuilderTest {
+public class AddLocalMockProposalTest {
 
     private static IJavaProject _testProject;
     private static IPackageFragmentRoot _sourceFolder;
@@ -66,18 +63,14 @@ public class LocalMockInitializationDeclarationBuilderTest {
     }
 
     @Test
-    public void shouldCreateMockOfSpecifiedType() throws NotSupportedRefactoring {
+    public void shouldCreateMockOfSpecifiedType() throws NotSupportedRefactoring, CoreException {
         final MethodDeclaration aMethod = _type.getMethods()[0];
         final ExpressionStatement invocationStatement = (ExpressionStatement) aMethod.getBody().statements().get(0);
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
         final SimpleName selectedNode = (SimpleName) bMethodInvocation.arguments().get(0);
-        final ASTRewrite rewrite = ASTRewrite.create(selectedNode.getAST());
-        final ImportRewrite importRewrite = StubUtility.createImportRewrite(_astCu, true);
-        final LocalMockInitializationDeclarationBuilder testedClass = new LocalMockInitializationDeclarationBuilder(selectedNode, new AstResolver().findParentMethodBodyDeclaration(selectedNode), _astCu, rewrite, importRewrite);
-        
-        testedClass.build();
+        final AddLocalMockProposal testedClass = new AddLocalMockProposal(_cu, selectedNode, _astCu);
 
-        final List rewrittenList = rewrite.getListRewrite(aMethod.getBody(), Block.STATEMENTS_PROPERTY).getRewrittenList();
+        final List rewrittenList = testedClass.getRewrite().getListRewrite(aMethod.getBody(), Block.STATEMENTS_PROPERTY).getRewrittenList();
         final Object result = rewrittenList.get(0);
         final ExpressionStatement expressionStatement = (ExpressionStatement)result;
         final Assignment assignment = (Assignment) expressionStatement.getExpression();

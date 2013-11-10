@@ -1,4 +1,4 @@
-package pl.greenpath.mockito.ide.refactoring.ast;
+package pl.greenpath.mockito.ide.refactoring.proposal;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
 @SuppressWarnings("restriction")
