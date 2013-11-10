@@ -20,6 +20,9 @@ import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite.ImportRewriteContext;
 import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRewriteContext;
 
+import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
+import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
+
 public class LocalMockInitializationDeclarationBuilder {
 
     private static final String MOCKITO_PACKAGE = "org.mockito.Mockito";
@@ -44,7 +47,8 @@ public class LocalMockInitializationDeclarationBuilder {
         importRewriteContext = new ContextSensitiveImportRewriteContext(methodBody, importRewrite);
     }
 
-    public void build() {
+    public void build() throws NotSupportedRefactoring {
+        setMockMethodInvocation(new ContextBaseTypeFinder(selectedNode).find());
         rewrite.getListRewrite(methodBody.getBody(), Block.STATEMENTS_PROPERTY).insertFirst(initLocalMockExpression,
                 null);
     }
@@ -57,7 +61,7 @@ public class LocalMockInitializationDeclarationBuilder {
         return variable;
     }
 
-    public LocalMockInitializationDeclarationBuilder setMockMethodInvocation(final ITypeBinding typeBinding) {
+    private LocalMockInitializationDeclarationBuilder setMockMethodInvocation(final ITypeBinding typeBinding) {
         importStaticMethod(MOCKITO_PACKAGE, MOCK_METHOD_NAME);
         initLocalMockExpression = ast.newExpressionStatement(createMockAssignment(importType(typeBinding)));
         return this;

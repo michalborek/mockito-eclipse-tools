@@ -3,8 +3,6 @@ package pl.greenpath.mockito.ide.refactoring.proposal;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.ui.ISharedImages;
@@ -14,35 +12,34 @@ import org.eclipse.swt.graphics.Image;
 import pl.greenpath.mockito.ide.refactoring.PluginImages;
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
 import pl.greenpath.mockito.ide.refactoring.builder.LocalMockInitializationDeclarationBuilder;
+import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
 public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
 
-    private final ITypeBinding typeBinding;
     private final SimpleName selectedNode;
     private final CompilationUnit astRoot;
-    private final MethodDeclaration methodDeclaration;
 
     public AddLocalMockProposal(final ICompilationUnit cu, final SimpleName selectedNode,
-            final ITypeBinding typeBinding,
             final CompilationUnit astRoot) {
         super("Create local mock", cu, null, 0);
         this.selectedNode = selectedNode;
-        this.typeBinding = typeBinding;
         this.astRoot = astRoot;
-        methodDeclaration = new AstResolver().findParentMethodBodyDeclaration(selectedNode);
     }
 
     @Override
     protected ASTRewrite getRewrite() throws CoreException {
         final ASTRewrite rewrite = ASTRewrite.create(selectedNode.getAST());
         createImportRewrite(astRoot);
-        addMissingVariableDeclaration(rewrite);
+        try {
+            addMissingVariableDeclaration(rewrite);
+        } catch (final NotSupportedRefactoring e) {
+            e.printStackTrace(); // TODO logging
+        }
         return rewrite;
     }
 
-    private void addMissingVariableDeclaration(final ASTRewrite rewrite) {
-        new LocalMockInitializationDeclarationBuilder(selectedNode, methodDeclaration, astRoot, rewrite, getImportRewrite()).
-                setMockMethodInvocation(typeBinding).build();
+    private void addMissingVariableDeclaration(final ASTRewrite rewrite) throws NotSupportedRefactoring {
+        new LocalMockInitializationDeclarationBuilder(selectedNode, new AstResolver().findParentMethodBodyDeclaration(selectedNode), astRoot, rewrite, getImportRewrite()).build();
     }
 
     @Override

@@ -70,8 +70,7 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
         if (selectedNode.getNodeType() != ASTNode.SIMPLE_NAME) {
             throw new NotSupportedRefactoring("This selection is not supported by this refactoring");
         }
-        return new AddLocalMockProposal(context.getCompilationUnit(), (SimpleName) selectedNode,
-                new ContextBaseTypeFinder((SimpleName) selectedNode).find(), context.getASTRoot());
+        return new AddLocalMockProposal(context.getCompilationUnit(), (SimpleName) selectedNode, context.getASTRoot());
     }
 
     private AddMockFieldProposal getAddFieldMockProposal(final IInvocationContext context,
