@@ -1,7 +1,10 @@
 package pl.greenpath.mockito.ide.refactoring.builder;
 
+import java.util.List;
+
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -13,6 +16,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite.ImportRewriteContext;
+import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRewriteContext;
 
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
@@ -31,7 +35,8 @@ public class FieldDeclarationBuilder {
     private final ImportRewriteContext importRewriteContext;
     private MarkerAnnotation annotation;
 
-    public FieldDeclarationBuilder(final SimpleName selectedNode, final CompilationUnit parentClass, final ASTRewrite rewrite,
+    public FieldDeclarationBuilder(final SimpleName selectedNode, final CompilationUnit parentClass,
+            final ASTRewrite rewrite,
             final ImportRewrite importRewrite) {
         this.parentClass = parentClass;
         ast = selectedNode.getAST();
@@ -46,10 +51,43 @@ public class FieldDeclarationBuilder {
 
     public void build() {
         final ASTNode declaringNode = parentClass.findDeclaringNode(bindingFinder.getParentTypeBinding(selectedNode));
-        rewrite.getListRewrite(declaringNode, astResolver.getBodyDeclarationsProperty(declaringNode)).insertFirst(
-                fieldDeclaration, null);
-        rewrite.getListRewrite(fieldDeclaration, FieldDeclaration.MODIFIERS2_PROPERTY)
-                .insertFirst(annotation, null);
+        insertField(rewrite.getListRewrite(declaringNode, astResolver.getBodyDeclarationsProperty(declaringNode)));
+        rewrite.getListRewrite(fieldDeclaration, FieldDeclaration.MODIFIERS2_PROPERTY).insertFirst(annotation, null);
+    }
+
+    private void insertField(final ListRewrite fields) {
+        final FieldDeclaration insertAfter = getInsertAfterItem(fields.getRewrittenList());
+        if (insertAfter == null) {
+            fields.insertFirst(fieldDeclaration, null);
+        } else {
+            fields.insertAfter(fieldDeclaration, insertAfter, null);
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    private FieldDeclaration getInsertAfterItem(final List fields) {
+        FieldDeclaration insertBefore = null;
+        for (final Object fieldObj : fields) {
+            if (!(fieldObj instanceof FieldDeclaration)) {
+                continue;
+            }
+            final FieldDeclaration field = (FieldDeclaration) fieldObj;
+
+            final List modifiers = (List) field.getStructuralProperty(field.getModifiersProperty());
+            boolean found = false;
+            for (final Object modifier : modifiers) {
+                if (modifier instanceof Annotation
+                        && ((Annotation) modifier).getTypeName().getFullyQualifiedName().equals("Mock")) {
+                    insertBefore = field;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found && insertBefore != null) {
+                break;
+            }
+        }
+        return insertBefore;
     }
 
     private FieldDeclaration createFieldDeclaration() {
