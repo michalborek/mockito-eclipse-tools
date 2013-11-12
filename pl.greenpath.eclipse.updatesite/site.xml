@@ -3,5 +3,8 @@
    <description name="Eclipse Tools" url="http://eclipse.greenpath.pl">
       Refactoring tools for Eclipse
    </description>
-   <feature url="features/pl.greenpath.eclipse.refactoring_1.0.0.201311042224.jar" id="pl.greenpath.eclipse.refactoring" version="1.0.0.201311042224"/>
+   <feature url="features/pl.greenpath.eclipse.refactoring.feature_1.0.0.201311112040.jar" id="pl.greenpath.eclipse.refactoring.feature" version="1.0.0.201311112040">
+      <category name="pl.greenpath.eclipse.enhancements"/>
+   </feature>
+   <category-def name="pl.greenpath.eclipse.enhancements" label="Eclipse Testing Enhancements"/>
 </site>

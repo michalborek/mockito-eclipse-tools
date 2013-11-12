@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="pl.greenpath.eclipse.refactoring"
+      id="pl.greenpath.eclipse.refactoring.feature"
       label="Eclipse Refactoring Tools"
       version="1.0.0.qualifier"
       provider-name="Michal Borek">
