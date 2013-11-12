@@ -4,13 +4,11 @@ package pl.greenpath.mockito.ide.refactoring;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
@@ -18,7 +16,6 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.eclipse.jdt.testplugin.JavaProjectHelper;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -50,7 +47,7 @@ public class AstResolverTest {
     
     @Before
     public void before() {
-        final CompilationUnit astCu = createAST(_cu);
+        final CompilationUnit astCu = ASTTesting.createAST(_cu);
         _type = (TypeDeclaration) astCu.types().get(0);
         testedClass = new AstResolver();
     }
@@ -98,14 +95,4 @@ public class AstResolverTest {
         buf.append("}\n");
         return packageFragment.createCompilationUnit("A.java", buf.toString(), false, null);
     }
-
-    public static CompilationUnit createAST(final ICompilationUnit compilationUnit) {
-        final ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
-        parser.setSource(compilationUnit);
-        parser.setResolveBindings(true);
-        return (CompilationUnit) parser.createAST(new NullProgressMonitor());
-    }
-
-
-	
 }

@@ -5,13 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -25,13 +23,13 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.eclipse.jdt.testplugin.JavaProjectHelper;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import pl.greenpath.mockito.ide.refactoring.ASTTesting;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
 public class AddLocalMockProposalTest {
@@ -57,7 +55,7 @@ public class AddLocalMockProposalTest {
 
     @Before
     public void before() {
-        _astCu = createAST(_cu);
+        _astCu = ASTTesting.createAST(_cu);
         _type = (TypeDeclaration) _astCu.types().get(0);
     }
 
@@ -135,12 +133,4 @@ public class AddLocalMockProposalTest {
         buf.append("}\n");
         return packageFragment.createCompilationUnit("A.java", buf.toString(), false, null);
     }
-
-    public static CompilationUnit createAST(final ICompilationUnit compilationUnit) {
-        final ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
-        parser.setSource(compilationUnit);
-        parser.setResolveBindings(true);
-        return (CompilationUnit) parser.createAST(new NullProgressMonitor());
-    }
-
 }
