@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
@@ -34,32 +35,31 @@ public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
     private static final String MOCKITO_PACKAGE = "org.mockito.Mockito";
     private static final String MOCK_METHOD_NAME = "mock";
 
-    private final SimpleName selectedNode;
-    private final CompilationUnit astRoot;
-    private final AST ast;
-    private final MethodDeclaration methodBody;
-    private ImportRewrite importRewrite;
-    private ContextSensitiveImportRewriteContext importRewriteContext;
-    private ExpressionStatement initLocalMockExpression;
+    private final SimpleName _selectedNode;
+    private final CompilationUnit _astRoot;
+    private final AST _ast;
+    private final MethodDeclaration _methodBody;
+    private ImportRewrite _importRewrite;
+    private ContextSensitiveImportRewriteContext _importRewriteContext;
+    private ExpressionStatement _initLocalMockExpression;
     private ASTRewrite _rewrite;
 
     public AddLocalMockProposal(final ICompilationUnit cu, final SimpleName selectedNode,
             final CompilationUnit astRoot) {
         super("Create local mock", cu, null, 0);
-        this.selectedNode = selectedNode;
-        this.astRoot = astRoot;
-        ast = selectedNode.getAST();
-        
-        methodBody = new AstResolver().findParentMethodBodyDeclaration(selectedNode);
+        _selectedNode = selectedNode;
+        _astRoot = astRoot;
+        _ast = selectedNode.getAST();
+        _methodBody = new AstResolver().findParentOfType(selectedNode, MethodDeclaration.class);
     }
 
     @Override
     public ASTRewrite getRewrite() throws CoreException {
-        _rewrite = ASTRewrite.create(selectedNode.getAST());
-        importRewrite = createImportRewrite(astRoot);
-        importRewriteContext = new ContextSensitiveImportRewriteContext(methodBody, importRewrite);
+        _rewrite = ASTRewrite.create(_selectedNode.getAST());
+        _importRewrite = createImportRewrite(_astRoot);
+        _importRewriteContext = new ContextSensitiveImportRewriteContext(_methodBody, _importRewrite);
         try {
-           build();
+            performFix();
         } catch (final NotSupportedRefactoring e) {
             e.printStackTrace(); // TODO logging
         }
@@ -68,7 +68,7 @@ public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
 
     @Override
     public int getRelevance() {
-        if (selectedNode.getIdentifier().toLowerCase().endsWith("mock")) {
+        if (_selectedNode.getIdentifier().toLowerCase().endsWith("mock")) {
             return 99;
         }
         return super.getRelevance();
@@ -78,28 +78,29 @@ public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
     public Image getImage() {
         return PluginImages.get(ISharedImages.IMG_OBJS_LOCAL_VARIABLE);
     }
-    
-    public void build() throws NotSupportedRefactoring {
-        setMockMethodInvocation(new ContextBaseTypeFinder(selectedNode).find());
-        _rewrite.getListRewrite(methodBody.getBody(), Block.STATEMENTS_PROPERTY).insertFirst(initLocalMockExpression,
-                null);
+
+    public void performFix() throws NotSupportedRefactoring {
+        setMockMethodInvocation(new ContextBaseTypeFinder(_selectedNode).find());
+        final Statement currentStatement = new AstResolver().findParentOfType(_selectedNode, Statement.class);
+        _rewrite.getListRewrite(_methodBody.getBody(), Block.STATEMENTS_PROPERTY).insertBefore(
+                _initLocalMockExpression, currentStatement, null);
     }
 
     private VariableDeclarationExpression createVariable(final Type type) {
-        final VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
-        fragment.setName(ast.newSimpleName(selectedNode.getIdentifier()));
-        final VariableDeclarationExpression variable = ast.newVariableDeclarationExpression(fragment);
-        variable.setType((Type) ASTNode.copySubtree(ast, type));
+        final VariableDeclarationFragment fragment = _ast.newVariableDeclarationFragment();
+        fragment.setName(_ast.newSimpleName(_selectedNode.getIdentifier()));
+        final VariableDeclarationExpression variable = _ast.newVariableDeclarationExpression(fragment);
+        variable.setType((Type) ASTNode.copySubtree(_ast, type));
         return variable;
     }
 
     private void setMockMethodInvocation(final ITypeBinding typeBinding) {
         importStaticMethod(MOCKITO_PACKAGE, MOCK_METHOD_NAME);
-        initLocalMockExpression = ast.newExpressionStatement(createMockAssignment(importType(typeBinding)));
+        _initLocalMockExpression = _ast.newExpressionStatement(createMockAssignment(importType(typeBinding)));
     }
 
     private Assignment createMockAssignment(final Type type) {
-        final Assignment result = ast.newAssignment();
+        final Assignment result = _ast.newAssignment();
         result.setLeftHandSide(createVariable(type));
         result.setRightHandSide(createMockMethodInvocation(type));
         return result;
@@ -107,15 +108,15 @@ public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
 
     @SuppressWarnings("unchecked")
     private MethodInvocation createMockMethodInvocation(final Type type) {
-        final MethodInvocation result = ast.newMethodInvocation();
-        result.setName(ast.newSimpleName(MOCK_METHOD_NAME));
+        final MethodInvocation result = _ast.newMethodInvocation();
+        result.setName(_ast.newSimpleName(MOCK_METHOD_NAME));
         result.arguments().add(getTypeLiteral(type));
         return result;
     }
 
     private TypeLiteral getTypeLiteral(final Type type) {
-        final TypeLiteral result = ast.newTypeLiteral();
-        result.setType((Type) ASTNode.copySubtree(ast, getTypeForTypeLiteral(type)));
+        final TypeLiteral result = _ast.newTypeLiteral();
+        result.setType((Type) ASTNode.copySubtree(_ast, getTypeForTypeLiteral(type)));
         return result;
     }
 
@@ -128,11 +129,11 @@ public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
     }
 
     private Type importType(final ITypeBinding typeBinding) {
-        return importRewrite.addImport(typeBinding, ast, importRewriteContext);
+        return _importRewrite.addImport(typeBinding, _ast, _importRewriteContext);
     }
 
     private String importStaticMethod(final String qualifiedName, final String methodName) {
-        return importRewrite.addStaticImport(qualifiedName, methodName, false, importRewriteContext);
+        return _importRewrite.addStaticImport(qualifiedName, methodName, false, _importRewriteContext);
     }
 
 }

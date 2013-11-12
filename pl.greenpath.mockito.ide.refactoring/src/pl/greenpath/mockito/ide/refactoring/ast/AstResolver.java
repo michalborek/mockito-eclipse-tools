@@ -3,9 +3,7 @@ package pl.greenpath.mockito.ide.refactoring.ast;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 /**
  * A helper class to find declarations based on given AST nodes
@@ -14,24 +12,15 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
  */
 public class AstResolver {
 
-    public MethodDeclaration findParentMethodBodyDeclaration(final ASTNode node) {
+    @SuppressWarnings("unchecked")
+    public <T> T findParentOfType(final ASTNode node, final Class<T> type) {
         if (node == null) {
             return null;
         }
-        if (node instanceof MethodDeclaration) {
-            return (MethodDeclaration) node;
+        if (type.isAssignableFrom(node.getClass())) {
+            return (T) node;
         }
-        return findParentMethodBodyDeclaration(node.getParent());
-    }
-
-    public BodyDeclaration findParentBodyDeclaration(final ASTNode node) {
-        if (node == null) {
-            return null;
-        }
-        if (node instanceof BodyDeclaration) {
-            return (BodyDeclaration) node;
-        }
-        return findParentBodyDeclaration(node.getParent());
+        return findParentOfType(node.getParent(), type);
     }
 
     public ChildListPropertyDescriptor getBodyDeclarationsProperty(final ASTNode node) {

@@ -62,7 +62,7 @@ public class AstResolverTest {
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
         final SimpleName testMockName = (SimpleName) bMethodInvocation.arguments().get(0);
 	    
-        final MethodDeclaration result = testedClass.findParentMethodBodyDeclaration(testMockName);
+        final MethodDeclaration result = testedClass.findParentOfType(testMockName, MethodDeclaration.class);
         assertThat(result).isEqualTo(aMethod);
 	}
 
@@ -73,23 +73,15 @@ public class AstResolverTest {
 	    final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
 	    final SimpleName testMockName = (SimpleName) bMethodInvocation.arguments().get(0);
 	    
-	    final BodyDeclaration result = testedClass.findParentBodyDeclaration(testMockName);
+	    final BodyDeclaration result = testedClass.findParentOfType(testMockName, BodyDeclaration.class);
 	    assertThat(result).isEqualTo(aMethod);
 	}
 
 	@Test
 	public void shouldReturnNullWhenNullGiven() {
-	    assertThat(testedClass.findParentBodyDeclaration(null)).isNull();
+	    assertThat(testedClass.findParentOfType(null, BodyDeclaration.class)).isNull();
 	}
 
-	@Test
-	public void shouldBeNullForNull() {
-		final BodyDeclaration nodeMock = null;
-		final BodyDeclaration result = testedClass.findParentMethodBodyDeclaration(nodeMock);
-		
-		assertThat(result).isNull();
-	}
-	
     public static ICompilationUnit createCompilationUnit() throws CoreException, JavaModelException {
         final IPackageFragment packageFragment = _sourceFolder.createPackageFragment("test1", false, null);
         final StringBuilder buf = new StringBuilder();

@@ -5,6 +5,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
@@ -34,7 +35,7 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
 		this.selectedNode = selectedNode;
 		this.typeBinding = typeBinding;
 		this.astRoot = astRoot;
-		methodBodyDeclaration = new AstResolver().findParentMethodBodyDeclaration(selectedNode);
+		methodBodyDeclaration = new AstResolver().findParentOfType(selectedNode, MethodDeclaration.class);
 	}
 
 	@Override
