@@ -5,10 +5,10 @@
 	<artifactId>pl.greenpath.mockito.ide.refactoring.tests</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
 	<parent>
-		<groupId>pl.greenpath.eclipse.build</groupId>
-		<artifactId>pl.greenpath.eclipse.build</artifactId>
+		<artifactId>mockito-eclipse-tools</artifactId>
 		<version>1.1.0-SNAPSHOT</version>
-		<relativePath>../../pl.greenpath.eclipse.build/pom.xml</relativePath>
+		<relativePath>../../pom.xml</relativePath>
+		<groupId>mockito-eclipse-tools</groupId>
 	</parent>
 
 	<dependencies>
