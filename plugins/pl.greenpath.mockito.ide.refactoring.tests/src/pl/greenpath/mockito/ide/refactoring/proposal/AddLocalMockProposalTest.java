@@ -1,6 +1,8 @@
 package pl.greenpath.mockito.ide.refactoring.proposal;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -23,13 +25,13 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.testplugin.JavaProjectHelper;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import pl.greenpath.mockito.ide.refactoring.ASTTesting;
+import pl.greenpath.mockito.ide.refactoring.JavaProjectHelper;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
 public class AddLocalMockProposalTest {
@@ -74,10 +76,10 @@ public class AddLocalMockProposalTest {
         final VariableDeclarationExpression leftSide = (VariableDeclarationExpression)assignment.getLeftHandSide();
         final Type type = leftSide.getType();
         final MethodInvocation rightSide = (MethodInvocation) assignment.getRightHandSide();
-        assertThat(((SimpleType)type).getName().getFullyQualifiedName()).isEqualTo("String");
-        assertThat(((VariableDeclarationFragment)leftSide.fragments().get(0)).getName().getIdentifier()).isEqualTo("testMock");
-        assertThat(rightSide.getName().getIdentifier()).isEqualTo("mock");
-        assertThat(((SimpleType)((TypeLiteral)rightSide.arguments().get(0)).getType()).getName().getFullyQualifiedName()).isEqualTo("String");
+        assertEquals("String", ((SimpleType)type).getName().getFullyQualifiedName());
+        assertEquals("testMock", ((VariableDeclarationFragment)leftSide.fragments().get(0)).getName().getIdentifier());
+        assertEquals("mock", rightSide.getName().getIdentifier());
+        assertEquals("String", ((SimpleType)((TypeLiteral)rightSide.arguments().get(0)).getType()).getName().getFullyQualifiedName());
     }
     
     @Test
@@ -89,7 +91,7 @@ public class AddLocalMockProposalTest {
         
         final AddLocalMockProposal testedClass = new AddLocalMockProposal(_cu, selectedNode, _astCu);
         
-        assertThat(testedClass.getRelevance()).isEqualTo(99);
+        assertEquals(99, testedClass.getRelevance());
     }
 
     @Test
@@ -101,7 +103,7 @@ public class AddLocalMockProposalTest {
         
         final AddLocalMockProposal testedClass = new AddLocalMockProposal(_cu, selectedNode, _astCu);
         
-        assertThat(testedClass.getRelevance()).isLessThan(90);
+        assertTrue(testedClass.getRelevance() < 90);
     }
     
     @Test
@@ -113,7 +115,7 @@ public class AddLocalMockProposalTest {
         
         final AddLocalMockProposal testedClass = new AddLocalMockProposal(_cu, selectedNode, _astCu);
         
-        assertThat(testedClass.getImage()).isNotNull();
+        assertNotNull(testedClass.getImage());
     }
 
     public static ICompilationUnit createCompilationUnit() throws CoreException, JavaModelException {

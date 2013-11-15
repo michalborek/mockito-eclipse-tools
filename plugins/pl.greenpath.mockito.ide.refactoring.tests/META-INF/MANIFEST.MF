@@ -6,10 +6,6 @@ Bundle-Vendor: Michal Borek
 Fragment-Host: pl.greenpath.mockito.ide.refactoring;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit,
- org.eclipse.jdt.ui.tests,
- org.eclipse.core.resources;bundle-version="3.8.101",
- org.eclipse.jdt.core
-Bundle-Version: 1.0.0.qualifier
-Bundle-ClassPath: lib/mockito-all-1.9.5.jar,
- .,
- lib/assertj-core-1.6.0-SNAPSHOT.jar
+ org.eclipse.core.resources;bundle-version="3.8.101"
+Bundle-Version: 1.1.0.qualifier
+Bundle-ClassPath: .

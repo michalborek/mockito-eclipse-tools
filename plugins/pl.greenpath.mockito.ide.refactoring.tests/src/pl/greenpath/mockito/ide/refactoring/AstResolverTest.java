@@ -1,7 +1,8 @@
 package pl.greenpath.mockito.ide.refactoring;
 
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -16,7 +17,6 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.testplugin.JavaProjectHelper;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -60,7 +60,7 @@ public class AstResolverTest {
         final SimpleName testMockName = (SimpleName) bMethodInvocation.arguments().get(0);
 	    
         final MethodDeclaration result = testedClass.findParentOfType(testMockName, MethodDeclaration.class);
-        assertThat(result).isEqualTo(aMethod);
+        assertEquals(aMethod, result);
 	}
 
 	@Test
@@ -71,12 +71,12 @@ public class AstResolverTest {
 	    final SimpleName testMockName = (SimpleName) bMethodInvocation.arguments().get(0);
 	    
 	    final BodyDeclaration result = testedClass.findParentOfType(testMockName, BodyDeclaration.class);
-	    assertThat(result).isEqualTo(aMethod);
+	    assertEquals(aMethod, result);
 	}
 
 	@Test
 	public void shouldReturnNullWhenNullGiven() {
-	    assertThat(testedClass.findParentOfType(null, BodyDeclaration.class)).isNull();
+	    assertNull(testedClass.findParentOfType(null, BodyDeclaration.class));
 	}
 
     public static ICompilationUnit createCompilationUnit() throws CoreException, JavaModelException {

@@ -1,0 +1,201 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>pl.greenpath.eclipse.build</groupId>
+	<artifactId>pl.greenpath.eclipse.build</artifactId>
+	<version>1.1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<properties>
+		<orbit-repo.url>http://download.eclipse.org/tools/orbit/downloads/drops/S20131024145017/repository/</orbit-repo.url>
+		<jetty-repo.url>http://download.eclipse.org/jetty/updates/jetty-bundles-8.x/8.1.12.v20130726/</jetty-repo.url>
+		<ecf-repo.url>http://download.eclipse.org/rt/ecf/3.7.1/site.p2</ecf-repo.url>
+		<emf-repo.url>http://download.eclipse.org/modeling/emf/emf/updates/2.10milestones/base/S201310280429/</emf-repo.url>
+		<aspectj-repo.url>http://download.eclipse.org/tools/ajdt/aspectj/update/e42</aspectj-repo.url>
+		<egit-repo.url>http://download.eclipse.org/egit/updates-3.1</egit-repo.url>
+		<license-repo.url>http://download.eclipse.org/cbi/updates/license/</license-repo.url>
+
+		<tycho-version>0.15.0</tycho-version>
+		<tycho-extras-version>${tycho-version}</tycho-extras-version>
+		<tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
+		<m2e-core-version>1.2.0</m2e-core-version>
+		<site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</site-compressed>
+		<cbi-jdt-repo.url>https://repo.eclipse.org/content/repositories/eclipse-staging/</cbi-jdt-repo.url>
+		<cbi-jdt-version>3.10.0.v20131029-1755</cbi-jdt-version>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<eclipse-repo.url>https://repo.eclipse.org/content/repositories/releases/</eclipse-repo.url>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>juno</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/kepler</url>
+		</repository>
+
+		<repository>
+			<id>m2e</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/technology/m2e/releases/</url>
+		</repository>
+		<repository>
+			<id>orbit</id>
+			<url>${orbit-repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>ecf</id>
+			<url>${ecf-repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>jetty</id>
+			<url>${jetty-repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>emf</id>
+			<url>${emf-repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>license-feature</id>
+			<url>${license-repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>egit</id>
+			<url>${egit-repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<!-- aspectj is used by some rt.equinox.bundles and is required by sdk-tests 
+				feature -->
+			<id>aspectj</id>
+			<url>${aspectj-repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+					<ignoreTychoRepositories>true</ignoreTychoRepositories>
+					<dependency-resolution>
+						<extraRequirements>
+							<requirement>
+								<type>p2-installable-unit</type>
+								<id>org.eclipse.jdt.feature.group</id>
+								<versionRange>0.0.0</versionRange>
+							</requirement>
+						</extraRequirements>
+					</dependency-resolution>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-surefire-plugin</artifactId>
+					<version>${tycho-version}</version>
+					<configuration>
+						<useUIHarness>true</useUIHarness>
+						<includes>
+							<include>**/*Test.java</include>
+						</includes>
+						<argLine>${tycho.test.jvmArgs}</argLine>
+						<!-- kill test JVM it tests take more than 5 minutes (300 seconds to 
+							finish -->
+						<forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
+						<appArgLine>-pluginCustomization
+							${basedir}/plugin_customization.ini</appArgLine>
+					</configuration>
+				</plugin>
+
+
+				<!-- important for self-hosting -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.5</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>tycho</id>
+			<url>${tycho-repo.url}</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>cbi-jdt</id>
+			<url>${cbi-jdt-repo.url}</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>cbi-snapshots</id>
+			<url>${cbi-snapshots-repo.url}</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>eclipse</id>
+			<url>${eclipse-repo.url}</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<modules>
+		<module>../plugins/pl.greenpath.mockito.ide.refactoring</module>
+	    <module>../plugins/pl.greenpath.mockito.ide.refactoring.tests</module>
+	</modules>
+</project>

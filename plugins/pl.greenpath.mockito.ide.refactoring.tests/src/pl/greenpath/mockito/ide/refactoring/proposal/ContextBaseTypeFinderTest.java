@@ -20,13 +20,13 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.testplugin.JavaProjectHelper;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import pl.greenpath.mockito.ide.refactoring.ASTTesting;
+import pl.greenpath.mockito.ide.refactoring.JavaProjectHelper;
 import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 

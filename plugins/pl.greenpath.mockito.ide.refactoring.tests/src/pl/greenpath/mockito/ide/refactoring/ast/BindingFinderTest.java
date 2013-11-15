@@ -1,6 +1,7 @@
 package pl.greenpath.mockito.ide.refactoring.ast;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -15,13 +16,13 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.testplugin.JavaProjectHelper;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import pl.greenpath.mockito.ide.refactoring.ASTTesting;
+import pl.greenpath.mockito.ide.refactoring.JavaProjectHelper;
 
 public class BindingFinderTest {
 
@@ -29,7 +30,6 @@ public class BindingFinderTest {
     private static IPackageFragmentRoot _sourceFolder;
     private static ICompilationUnit _cu;
     private TypeDeclaration _type;
-    private AstResolver testedClass;
     private BindingFinder _testedClass;
 
     @BeforeClass
@@ -56,7 +56,7 @@ public class BindingFinderTest {
     public void shouldFindAbstractTypeDeclaration() {
         final MethodDeclaration aMethod = _type.getMethods()[0];
 
-        assertThat(_testedClass.getParentTypeBinding(aMethod)).isEqualTo(_type.resolveBinding());
+        assertEquals(_type.resolveBinding(), _testedClass.getParentTypeBinding(aMethod));
     }
 
     @Test
@@ -68,12 +68,12 @@ public class BindingFinderTest {
         final MethodDeclaration methodDeclaration = (MethodDeclaration) anonymousClass.bodyDeclarations().get(0);
         final Statement toStringStatement = (Statement) methodDeclaration.getBody().statements().get(0);
 
-        assertThat(_testedClass.getParentTypeBinding(toStringStatement)).isEqualTo(anonymousClass.resolveBinding());
+        assertEquals(anonymousClass.resolveBinding(), _testedClass.getParentTypeBinding(toStringStatement));
     }
 
     @Test
     public void shouldReturnNullForNullArgument() {
-        assertThat(_testedClass.getParentTypeBinding(null)).isNull();
+        assertNull(_testedClass.getParentTypeBinding(null));
     }
 
     public static ICompilationUnit createCompilationUnit() throws CoreException, JavaModelException {
