@@ -1,5 +1,5 @@
 language: java
-script: mvn integration-test --debug
+script: mvn integration-test
 before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
