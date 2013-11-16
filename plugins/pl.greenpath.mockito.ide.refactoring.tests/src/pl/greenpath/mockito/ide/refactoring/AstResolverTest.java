@@ -62,7 +62,6 @@ public class AstResolverTest {
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
         final SimpleName testMockName = (SimpleName) bMethodInvocation.arguments().get(0);
         final MethodDeclaration result = testedClass.findParentOfType(testMockName, MethodDeclaration.class);
-
         assertEquals("a", result.getName().getIdentifier());
     }
 

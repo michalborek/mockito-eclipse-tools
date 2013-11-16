@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>pl.greenpath.mockito.ide.refactoring.tests</groupId>
+	<groupId>pl.greenpath.mockito.ide.refactoring</groupId>
 	<artifactId>pl.greenpath.mockito.ide.refactoring.tests</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
 	<parent>
@@ -55,45 +55,47 @@
 	      
 		</resources>
 		<plugins>
-		     <plugin>
+		    <plugin>
 	        <!-- configuration of which test suite to run -->
 	        <groupId>org.eclipse.tycho</groupId>
 	        <artifactId>tycho-surefire-plugin</artifactId>
 	        <configuration>
+	          <testClassesDirectory>${project.build.directory}/classes</testClassesDirectory>
 	          <redirectTestOutputToFile>true</redirectTestOutputToFile>
 	          <testSuite>${project.artifactId}</testSuite>
 	          <testClass>pl.greenpath.mockito.ide.refactoring.AllTests</testClass>
+	       	  <showEclipseLog>true</showEclipseLog>
 	        </configuration>
 	      </plugin>
-      <plugin>
-        <!-- copy the mockito jar, so it can be used in eclipse -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-        <execution>
-            <id>copy</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.mockito</groupId>
-                  <artifactId>mockito-all</artifactId>
-                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-				  <groupId>org.assertj</groupId>
-				  <artifactId>assertj-core</artifactId>
-                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-	</plugins>
+	      <plugin>
+	        <!-- copy the mockito jar, so it can be used in eclipse -->
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-dependency-plugin</artifactId>
+	        <executions>
+	        <execution>
+	            <id>copy</id>
+	            <phase>initialize</phase>
+	            <goals>
+	              <goal>copy</goal>
+	            </goals>
+	            <configuration>
+	              <artifactItems>
+	                <artifactItem>
+	                  <groupId>org.mockito</groupId>
+	                  <artifactId>mockito-all</artifactId>
+	                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+	                </artifactItem>
+	                <artifactItem>
+					  <groupId>org.assertj</groupId>
+					  <artifactId>assertj-core</artifactId>
+	                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+	                </artifactItem>
+	              </artifactItems>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+		</plugins>
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
@@ -127,18 +129,6 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
-            <plugin>
-              <groupId>org.eclipse.tycho</groupId>
-              <artifactId>tycho-surefire-plugin</artifactId>
-              <configuration>
-                <dependencies>
-                  <dependency>
-                    <artifactId>org.eclipse.jdt.ui.test</artifactId>
-                    <type>eclipse-test-plugin</type>
-                  </dependency>
-                </dependencies>
-              </configuration>
-            </plugin>
 			</plugins>
 		</pluginManagement>
 	</build>

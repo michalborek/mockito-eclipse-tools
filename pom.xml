@@ -156,19 +156,16 @@
 					<artifactId>tycho-surefire-plugin</artifactId>
 					<version>${tycho-version}</version>
 					<configuration>
-						<useUIHarness>false</useUIHarness>
+						<useUIHarness>true</useUIHarness>
 						<includes>
 							<include>**/*Test.java</include>
 						</includes>
 						<argLine>${tycho.test.jvmArgs}</argLine>
-						<!-- kill test JVM it tests take more than 5 minutes (300 seconds to 
-							finish -->
 						<forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
-<!-- 						<appArgLine>-pluginCustomization
+						<!-- <appArgLine>-pluginCustomization
 							${basedir}/plugin_customization.ini</appArgLine> -->
 					</configuration>
 				</plugin>
-
 
 				<!-- important for self-hosting -->
 				<plugin>
@@ -179,6 +176,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	
 
 	<pluginRepositories>
 		<pluginRepository>
