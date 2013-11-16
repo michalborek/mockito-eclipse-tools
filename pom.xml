@@ -32,42 +32,66 @@
 			<id>juno</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/releases/kepler</url>
+			      <snapshots>
+        <updatePolicy>daily</updatePolicy>
+      </snapshots>
 		</repository>
 
 		<repository>
 			<id>m2e</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/technology/m2e/releases/</url>
+			      <snapshots>
+        <updatePolicy>daily</updatePolicy>
+      </snapshots>
 		</repository>
 		<repository>
 			<id>orbit</id>
 			<url>${orbit-repo.url}</url>
 			<layout>p2</layout>
+			      <snapshots>
+        <updatePolicy>daily</updatePolicy>
+      </snapshots>
 		</repository>
 		<repository>
 			<id>ecf</id>
 			<url>${ecf-repo.url}</url>
 			<layout>p2</layout>
+			      <snapshots>
+        <updatePolicy>daily</updatePolicy>
+      </snapshots>
 		</repository>
 		<repository>
 			<id>jetty</id>
 			<url>${jetty-repo.url}</url>
 			<layout>p2</layout>
+			      <snapshots>
+        <updatePolicy>daily</updatePolicy>
+      </snapshots>
 		</repository>
 		<repository>
 			<id>emf</id>
 			<url>${emf-repo.url}</url>
 			<layout>p2</layout>
+			      <snapshots>
+        <updatePolicy>daily</updatePolicy>
+      </snapshots>
 		</repository>
 		<repository>
 			<id>license-feature</id>
 			<url>${license-repo.url}</url>
 			<layout>p2</layout>
+      <snapshots>
+        <updatePolicy>daily</updatePolicy>
+      </snapshots>
 		</repository>
 		<repository>
 			<id>egit</id>
 			<url>${egit-repo.url}</url>
 			<layout>p2</layout>
+		      <snapshots>
+		        <updatePolicy>daily</updatePolicy>
+		      </snapshots>
 		</repository>
 		<repository>
 			<!-- aspectj is used by some rt.equinox.bundles and is required by sdk-tests 
@@ -75,6 +99,9 @@
 			<id>aspectj</id>
 			<url>${aspectj-repo.url}</url>
 			<layout>p2</layout>
+	      <snapshots>
+	        <updatePolicy>daily</updatePolicy>
+	      </snapshots>
 		</repository>
 	</repositories>
 
@@ -129,7 +156,7 @@
 					<artifactId>tycho-surefire-plugin</artifactId>
 					<version>${tycho-version}</version>
 					<configuration>
-						<useUIHarness>true</useUIHarness>
+						<useUIHarness>false</useUIHarness>
 						<includes>
 							<include>**/*Test.java</include>
 						</includes>
@@ -137,8 +164,8 @@
 						<!-- kill test JVM it tests take more than 5 minutes (300 seconds to 
 							finish -->
 						<forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
-						<appArgLine>-pluginCustomization
-							${basedir}/plugin_customization.ini</appArgLine>
+<!-- 						<appArgLine>-pluginCustomization
+							${basedir}/plugin_customization.ini</appArgLine> -->
 					</configuration>
 				</plugin>
 

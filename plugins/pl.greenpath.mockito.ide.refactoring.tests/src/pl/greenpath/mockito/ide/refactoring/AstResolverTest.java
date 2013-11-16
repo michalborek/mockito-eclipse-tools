@@ -1,15 +1,18 @@
 package pl.greenpath.mockito.ide.refactoring;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.zip.ZipException;
+
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
@@ -25,26 +28,26 @@ import org.junit.Test;
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
 
 public class AstResolverTest {
-    
-    private static IJavaProject _testProject;
-    private static IPackageFragmentRoot _sourceFolder;
+
+    private static final String PROJECT_NAME = "test-project";
     private static ICompilationUnit _cu;
     private TypeDeclaration _type;
     private AstResolver testedClass;
 
     @BeforeClass
-    public static void beforeClass() throws CoreException {
-        _testProject = JavaProjectHelper.createJavaProject("testProject", "bin");
-        _sourceFolder = JavaProjectHelper.addSourceContainer(_testProject, "src");
-        JavaProjectHelper.addRTJar16(_testProject);
-        _cu = createCompilationUnit();
+    public static void beforeClass() throws CoreException, InvocationTargetException, ZipException, IOException {
+        final String pluginPath = "test/resources/test-project.zip";
+        final IJavaProject jproject = TestProjectHelper.importProject(pluginPath, PROJECT_NAME);
+        
+        final IPackageFragmentRoot sourceFolder = jproject.getPackageFragmentRoot(jproject.getResource().getProject().getFolder("src"));
+        _cu = sourceFolder.getPackageFragment("test1").getCompilationUnit("A.java");
     }
 
     @AfterClass
     public static void clearClass() throws CoreException {
-        JavaProjectHelper.delete(_testProject);
+        ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME).delete(true, new NullProgressMonitor());
     }
-    
+
     @Before
     public void before() {
         final CompilationUnit astCu = ASTTesting.createAST(_cu);
@@ -52,47 +55,30 @@ public class AstResolverTest {
         testedClass = new AstResolver();
     }
 
-	@Test
-	public void shouldFindParentMethodDeclarationWhenGivenAstNode() {
-	    final MethodDeclaration aMethod = _type.getMethods()[0];
+    @Test
+    public void shouldFindParentMethodDeclarationWhenGivenAstNode() {
+        final ExpressionStatement invocationStatement = (ExpressionStatement) _type.getMethods()[0].getBody()
+                .statements().get(0);
+        final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
+        final SimpleName testMockName = (SimpleName) bMethodInvocation.arguments().get(0);
+        final MethodDeclaration result = testedClass.findParentOfType(testMockName, MethodDeclaration.class);
+
+        assertEquals("a", result.getName().getIdentifier());
+    }
+
+    @Test
+    public void shouldFindParentBodyDeclarationWhenGivenAstNode() {
+        final MethodDeclaration aMethod = _type.getMethods()[0];
         final ExpressionStatement invocationStatement = (ExpressionStatement) aMethod.getBody().statements().get(0);
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
         final SimpleName testMockName = (SimpleName) bMethodInvocation.arguments().get(0);
-	    
-        final MethodDeclaration result = testedClass.findParentOfType(testMockName, MethodDeclaration.class);
+
+        final BodyDeclaration result = testedClass.findParentOfType(testMockName, BodyDeclaration.class);
         assertEquals(aMethod, result);
-	}
+    }
 
-	@Test
-	public void shouldFindParentBodyDeclarationWhenGivenAstNode() {
-	    final MethodDeclaration aMethod = _type.getMethods()[0];
-	    final ExpressionStatement invocationStatement = (ExpressionStatement) aMethod.getBody().statements().get(0);
-	    final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
-	    final SimpleName testMockName = (SimpleName) bMethodInvocation.arguments().get(0);
-	    
-	    final BodyDeclaration result = testedClass.findParentOfType(testMockName, BodyDeclaration.class);
-	    assertEquals(aMethod, result);
-	}
-
-	@Test
-	public void shouldReturnNullWhenNullGiven() {
-	    assertNull(testedClass.findParentOfType(null, BodyDeclaration.class));
-	}
-
-    public static ICompilationUnit createCompilationUnit() throws CoreException, JavaModelException {
-        final IPackageFragment packageFragment = _sourceFolder.createPackageFragment("test1", false, null);
-        final StringBuilder buf = new StringBuilder();
-        buf.append("package test1;\n");
-        buf.append("import java.util.ArrayList;");
-        buf.append("public class A {\n");
-        buf.append("    public void a() { b(testMock);}\n");
-        buf.append("    public void b(String a) { }\n");
-        buf.append("    public void c() { Double[] d = new Double[] { test2Mock };  }\n");
-        buf.append("    public void d() { ArrayList<String> s = new ArrayList<String>(test2Mock);  }\n");
-        buf.append("    public void e() { int[] arr = new int[2]; arr[0] = test3Mock;  }\n");
-        buf.append("    public String f() { return test4Mock;  }\n");
-        buf.append("    public void g() { long t = test4Mock;  }\n");
-        buf.append("}\n");
-        return packageFragment.createCompilationUnit("A.java", buf.toString(), false, null);
+    @Test
+    public void shouldReturnNullWhenNullGiven() {
+        assertNull(testedClass.findParentOfType(null, BodyDeclaration.class));
     }
 }

@@ -4,14 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.zip.ZipException;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -31,28 +34,28 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import pl.greenpath.mockito.ide.refactoring.ASTTesting;
-import pl.greenpath.mockito.ide.refactoring.JavaProjectHelper;
+import pl.greenpath.mockito.ide.refactoring.TestProjectHelper;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
 public class AddLocalMockProposalTest {
+    
+    private static final String PROJECT_NAME = "test-project";
 
-    private static IJavaProject _testProject;
-    private static IPackageFragmentRoot _sourceFolder;
     private static ICompilationUnit _cu;
     private TypeDeclaration _type;
     private CompilationUnit _astCu;
 
     @BeforeClass
-    public static void beforeClass() throws CoreException {
-        _testProject = JavaProjectHelper.createJavaProject("testProject", "bin");
-        _sourceFolder = JavaProjectHelper.addSourceContainer(_testProject, "src");
-        JavaProjectHelper.addRTJar16(_testProject);
-        _cu = createCompilationUnit();
+    public static void beforeClass() throws CoreException, InvocationTargetException, ZipException, IOException {
+        final String pluginPath = "test/resources/test-project.zip";
+        final IJavaProject jproject = TestProjectHelper.importProject(pluginPath, PROJECT_NAME);
+        final IPackageFragmentRoot sourceFolder = jproject.getPackageFragmentRoot(jproject.getResource().getProject().getFolder("src"));
+        _cu = sourceFolder.getPackageFragment("test1").getCompilationUnit("C.java");
     }
 
     @AfterClass
     public static void clearClass() throws CoreException {
-        JavaProjectHelper.delete(_testProject);
+        ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME).delete(true, new NullProgressMonitor());
     }
 
     @Before
@@ -118,21 +121,4 @@ public class AddLocalMockProposalTest {
         assertNotNull(testedClass.getImage());
     }
 
-    public static ICompilationUnit createCompilationUnit() throws CoreException, JavaModelException {
-        final IPackageFragment packageFragment = _sourceFolder.createPackageFragment("test1", false, null);
-        final StringBuilder buf = new StringBuilder();
-        buf.append("package test1;\n");
-        buf.append("import java.util.ArrayList;");
-        buf.append("public class A {\n");
-        buf.append("    public void a() { b(testMock);}\n");
-        buf.append("    public void b(String a) { }\n");
-        buf.append("    public void c() { Double[] d = new Double[] { test2Mock };  }\n");
-        buf.append("    public void d() { ArrayList<String> s = new ArrayList<String>(test2Mock);  }\n");
-        buf.append("    public void e() { int[] arr = new int[2]; arr[0] = test3Mock;  }\n");
-        buf.append("    public String f() { return test4Mock;  }\n");
-        buf.append("    public void g() { long t = test4Mock;  }\n");
-        buf.append("    public void h() { b(test);  }\n");
-        buf.append("}\n");
-        return packageFragment.createCompilationUnit("A.java", buf.toString(), false, null);
-    }
 }

@@ -6,6 +6,7 @@ Bundle-Vendor: Michal Borek
 Fragment-Host: pl.greenpath.mockito.ide.refactoring;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit,
- org.eclipse.core.resources;bundle-version="3.8.101"
+ org.eclipse.core.resources;bundle-version="3.8.101",
+ org.eclipse.ui.ide
 Bundle-Version: 1.1.0.qualifier
 Bundle-ClassPath: .

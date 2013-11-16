@@ -6,10 +6,12 @@ Bundle-Version: 1.1.0.qualifier
 Bundle-Activator: pl.greenpath.mockito.ide.refactoring.Activator
 Bundle-Vendor: Michal Borek
 Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.views,
  org.eclipse.core.runtime,
  org.eclipse.jdt.ui,
  org.eclipse.jdt.core,
  org.eclipse.jface.text,
- org.eclipse.ltk.core.refactoring
+ org.eclipse.ltk.core.refactoring,
+ org.eclipse.ui.ide;bundle-version="3.9.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
