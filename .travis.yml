@@ -1,1 +1,2 @@
 language: java
+test: mvn clean install
