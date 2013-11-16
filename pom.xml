@@ -1,107 +1,45 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>mockito-eclipse-tools</groupId>
 	<artifactId>mockito-eclipse-tools</artifactId>
 	<version>1.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
-		<orbit-repo.url>http://download.eclipse.org/tools/orbit/downloads/drops/S20131024145017/repository/</orbit-repo.url>
-		<jetty-repo.url>http://download.eclipse.org/jetty/updates/jetty-bundles-8.x/8.1.12.v20130726/</jetty-repo.url>
-		<ecf-repo.url>http://download.eclipse.org/rt/ecf/3.7.1/site.p2</ecf-repo.url>
-		<emf-repo.url>http://download.eclipse.org/modeling/emf/emf/updates/2.10milestones/base/S201310280429/</emf-repo.url>
-		<aspectj-repo.url>http://download.eclipse.org/tools/ajdt/aspectj/update/e42</aspectj-repo.url>
-		<egit-repo.url>http://download.eclipse.org/egit/updates-3.1</egit-repo.url>
-		<license-repo.url>http://download.eclipse.org/cbi/updates/license/</license-repo.url>
-
 		<tycho-version>0.15.0</tycho-version>
 		<tycho-extras-version>${tycho-version}</tycho-extras-version>
 		<tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
 		<m2e-core-version>1.2.0</m2e-core-version>
-		<site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</site-compressed>
 		<cbi-jdt-repo.url>https://repo.eclipse.org/content/repositories/eclipse-staging/</cbi-jdt-repo.url>
 		<cbi-jdt-version>3.10.0.v20131029-1755</cbi-jdt-version>
-
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<eclipse-repo.url>https://repo.eclipse.org/content/repositories/releases/</eclipse-repo.url>
 	</properties>
+	
+	<modules>
+		<module>plugins/pl.greenpath.mockito.ide.refactoring</module>
+		<module>plugins/pl.greenpath.mockito.ide.refactoring.tests</module>
+	</modules>
 
 	<repositories>
 		<repository>
 			<id>juno</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/releases/kepler</url>
-			      <snapshots>
-        <updatePolicy>daily</updatePolicy>
-      </snapshots>
+			<snapshots>
+				<updatePolicy>daily</updatePolicy>
+			</snapshots>
 		</repository>
 
 		<repository>
 			<id>m2e</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/technology/m2e/releases/</url>
-			      <snapshots>
-        <updatePolicy>daily</updatePolicy>
-      </snapshots>
-		</repository>
-		<repository>
-			<id>orbit</id>
-			<url>${orbit-repo.url}</url>
-			<layout>p2</layout>
-			      <snapshots>
-        <updatePolicy>daily</updatePolicy>
-      </snapshots>
-		</repository>
-		<repository>
-			<id>ecf</id>
-			<url>${ecf-repo.url}</url>
-			<layout>p2</layout>
-			      <snapshots>
-        <updatePolicy>daily</updatePolicy>
-      </snapshots>
-		</repository>
-		<repository>
-			<id>jetty</id>
-			<url>${jetty-repo.url}</url>
-			<layout>p2</layout>
-			      <snapshots>
-        <updatePolicy>daily</updatePolicy>
-      </snapshots>
-		</repository>
-		<repository>
-			<id>emf</id>
-			<url>${emf-repo.url}</url>
-			<layout>p2</layout>
-			      <snapshots>
-        <updatePolicy>daily</updatePolicy>
-      </snapshots>
-		</repository>
-		<repository>
-			<id>license-feature</id>
-			<url>${license-repo.url}</url>
-			<layout>p2</layout>
-      <snapshots>
-        <updatePolicy>daily</updatePolicy>
-      </snapshots>
-		</repository>
-		<repository>
-			<id>egit</id>
-			<url>${egit-repo.url}</url>
-			<layout>p2</layout>
-		      <snapshots>
-		        <updatePolicy>daily</updatePolicy>
-		      </snapshots>
-		</repository>
-		<repository>
-			<!-- aspectj is used by some rt.equinox.bundles and is required by sdk-tests 
-				feature -->
-			<id>aspectj</id>
-			<url>${aspectj-repo.url}</url>
-			<layout>p2</layout>
-	      <snapshots>
-	        <updatePolicy>daily</updatePolicy>
-	      </snapshots>
+			<snapshots>
+				<updatePolicy>daily</updatePolicy>
+			</snapshots>
 		</repository>
 	</repositories>
 
@@ -162,8 +100,6 @@
 						</includes>
 						<argLine>${tycho.test.jvmArgs}</argLine>
 						<forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
-						<!-- <appArgLine>-pluginCustomization
-							${basedir}/plugin_customization.ini</appArgLine> -->
 					</configuration>
 				</plugin>
 
@@ -176,7 +112,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	
+
 
 	<pluginRepositories>
 		<pluginRepository>
@@ -218,9 +154,4 @@
 		</pluginRepository>
 	</pluginRepositories>
 
-	<modules>
-		<module>plugins/pl.greenpath.mockito.ide.refactoring</module>
-	    <module>plugins/pl.greenpath.mockito.ide.refactoring.tests</module>
-	</modules>
-	<groupId>mockito-eclipse-tools</groupId>
 </project>
