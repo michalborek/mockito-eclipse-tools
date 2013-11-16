@@ -2,7 +2,7 @@ mockito-eclipse-tools
 =====================
 
 ##Building status
-![](https://travis-ci.org/michalborek/mockito-eclipse-tools.png?branch=master)(https://travis-ci.org/michalborek/mockito-eclipse-tools/)
+[![](https://travis-ci.org/michalborek/mockito-eclipse-tools.png?branch=master)](https://travis-ci.org/michalborek/mockito-eclipse-tools/)
 
 Eclipse plugin that simplifies test creation by providing refactorings for Mockito mocks.
 
