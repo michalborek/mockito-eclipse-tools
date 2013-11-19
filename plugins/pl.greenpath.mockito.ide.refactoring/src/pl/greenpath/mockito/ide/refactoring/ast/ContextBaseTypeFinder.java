@@ -11,7 +11,6 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
@@ -31,10 +30,10 @@ import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefac
  */
 public class ContextBaseTypeFinder {
 
-    private final SimpleName _selectedExpression;
+    private final ASTNode _selectedExpression;
     private final ASTNode _parent;
 
-    public ContextBaseTypeFinder(final SimpleName selectedExpression) {
+    public ContextBaseTypeFinder(final ASTNode selectedExpression) {
         this._selectedExpression = selectedExpression;
         _parent = selectedExpression.getParent();
     }
