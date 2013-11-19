@@ -1,8 +1,5 @@
-mockito-eclipse-tools
+mockito-eclipse-tools [![](https://travis-ci.org/michalborek/mockito-eclipse-tools.png?branch=master)](https://travis-ci.org/michalborek/mockito-eclipse-tools/)
 =====================
-
-##Building status
-![](https://travis-ci.org/michalborek/mockito-eclipse-tools.png?branch=master)
 
 Eclipse plugin that simplifies test creation by providing refactorings for Mockito mocks.
 
@@ -22,3 +19,7 @@ TBD.
 Mockito Quick-Fix Tool in Alpha version is available via Eclipse Marketplace 
 
 http://marketplace.eclipse.org/content/mockito-quick-fix-tools
+
+## Continuous integration
+
+Thanks for [Travis CI](http://travis-ci.org) for free CI instance
