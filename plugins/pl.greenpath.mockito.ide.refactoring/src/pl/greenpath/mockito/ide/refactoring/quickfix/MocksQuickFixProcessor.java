@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.ui.text.java.IInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
@@ -17,6 +18,7 @@ import org.eclipse.jdt.ui.text.java.IQuickFixProcessor;
 
 import pl.greenpath.mockito.ide.refactoring.proposal.AddLocalMockProposal;
 import pl.greenpath.mockito.ide.refactoring.proposal.AddMockFieldProposal;
+import pl.greenpath.mockito.ide.refactoring.proposal.ConvertToMockRecordProposal;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
 public class MocksQuickFixProcessor implements IQuickFixProcessor {
@@ -29,7 +31,10 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
         for (final IProblemLocation location : locations) {
             if (isUnresolvedVariable(location.getProblemId())) {
                 corrections.addAll(getMockCreationProposals(context, location));
-            } else if (isLocalMockDefinition(context)) {
+            } else if (canConvertWhenThenReturn(context, location)) {
+                corrections.add(getConvertToMockRecord(context, location));
+            }
+            else if (isLocalMockDefinition(context)) {
                 corrections.add(getMockConversionProposal(context, location));
             }
         }
@@ -48,6 +53,11 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
 
     private boolean isUnresolvedVariable(final int problemId) {
         return problemId == IProblem.UnresolvedVariable;
+    }
+    
+    private boolean canConvertWhenThenReturn(final IInvocationContext context, final IProblemLocation location) {
+        return location.getProblemId() == IProblem.ParsingErrorInsertToComplete
+                && context.getCoveringNode() instanceof MethodInvocation;
     }
 
     private List<IJavaCompletionProposal> getMockCreationProposals(final IInvocationContext context,
@@ -82,9 +92,15 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
         return new AddMockFieldProposal(context.getCompilationUnit(), (SimpleName) selectedNode, context.getASTRoot());
     }
 
+    private IJavaCompletionProposal getConvertToMockRecord(final IInvocationContext context, final IProblemLocation location) {
+        final ASTNode selectedNode = context.getCoveringNode();
+        
+        return new ConvertToMockRecordProposal(context.getCompilationUnit(), selectedNode, context.getASTRoot());
+    }
+
     @Override
     public boolean hasCorrections(final ICompilationUnit unit, final int problemId) {
         return unit.findPrimaryType().getElementName().endsWith("Test");
     }
-
+    
 }

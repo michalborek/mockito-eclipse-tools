@@ -75,5 +75,4 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
 	public Image getImage() {
 		return PluginImages.get(ISharedImages.IMG_FIELD_PRIVATE);
 	}
-
 }
