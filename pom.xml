@@ -1,15 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>mockito-eclipse-tools</groupId>
+	<groupId>pl.greenpath.mockito</groupId>
 	<artifactId>mockito-eclipse-tools</artifactId>
 	<version>1.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
 		<tycho-version>0.19.0</tycho-version>
-		<tycho-extras-version>${tycho-version}</tycho-extras-version>
-		<tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
 		<m2e-core-version>1.2.0</m2e-core-version>
 		<cbi-jdt-repo.url>https://repo.eclipse.org/content/repositories/eclipse-staging/</cbi-jdt-repo.url>
 		<cbi-jdt-version>3.10.0.v20131029-1755</cbi-jdt-version>
@@ -19,6 +17,8 @@
 	</properties>
 	
 	<modules>
+		<module>features/pl.greenpath.eclipse.refactoring.feature</module>
+		<module>pl.greenpath.eclipse.updatesite</module>
 		<module>plugins/pl.greenpath.mockito.ide.refactoring</module>
 		<module>plugins/pl.greenpath.mockito.ide.refactoring.tests</module>
 	</modules>
@@ -98,8 +98,6 @@
 						<includes>
 							<include>**/*Test.java</include>
 						</includes>
-						<argLine>${tycho.test.jvmArgs}</argLine>
-						<forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
 					</configuration>
 				</plugin>
 
