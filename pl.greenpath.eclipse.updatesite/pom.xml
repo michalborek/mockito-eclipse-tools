@@ -8,4 +8,17 @@
   	<version>1.1.0-SNAPSHOT</version>
   	<relativePath>../pom.xml</relativePath>
   </parent>
+  <scm>
+  	<url>https://github.com/michalborek/mockito-eclipse-tools</url>
+  	<developerConnection>Michal Borek</developerConnection>
+  </scm>
+  <issueManagement>
+  	<system>GitHub</system>
+  	<url>https://github.com/michalborek/mockito-eclipse-tools/issues</url>
+  </issueManagement>
+  <ciManagement>
+  	<system>Travis-CI</system>
+  	<url>https://travis-ci.org/michalborek/mockito-eclipse-tools</url>
+  </ciManagement>
+  <name>Mockito Quick-Fix Tools</name>
 </project>
