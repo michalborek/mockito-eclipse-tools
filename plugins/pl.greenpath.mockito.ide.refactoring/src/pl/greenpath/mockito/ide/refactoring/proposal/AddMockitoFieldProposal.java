@@ -17,19 +17,21 @@ import pl.greenpath.mockito.ide.refactoring.builder.FieldDeclarationBuilder;
 import pl.greenpath.mockito.ide.refactoring.builder.TypeSingleMemberAnnotationBuilder;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
-public class AddMockFieldProposal extends ASTRewriteCorrectionProposal {
+public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
 
-    private static final String MOCK = "org.mockito.Mock";
     private static final String MOCKITO_JUNIT_RUNNER = "org.mockito.runners.MockitoJUnitRunner";
+    private static final String MOCKITO_PACKAGE = "org.mockito.";
     private static final String RUN_WITH = "org.junit.runner.RunWith";
     private final SimpleName _selectedNode;
     private final CompilationUnit _astRoot;
+    private final String _mockitoAnnotation;
 
-    public AddMockFieldProposal(final ICompilationUnit cu, final SimpleName selectedNode,
-            final CompilationUnit astRoot) {
-        super("Create field mock", cu, null, 0);
+    public AddMockitoFieldProposal(final ICompilationUnit cu, final SimpleName selectedNode,
+            final CompilationUnit astRoot, String mockitoAnnotation) {
+        super("Create field " + mockitoAnnotation, cu, null, 0);
         _selectedNode = selectedNode;
         _astRoot = astRoot;
+        _mockitoAnnotation = MOCKITO_PACKAGE + mockitoAnnotation;
     }
 
     @Override
@@ -58,13 +60,13 @@ public class AddMockFieldProposal extends ASTRewriteCorrectionProposal {
         new FieldDeclarationBuilder(_selectedNode, _astRoot, rewrite, getImportRewrite())
                 .setType(new ContextBaseTypeFinder(_selectedNode).find())
                 .setModifiers(ModifierKeyword.PRIVATE_KEYWORD)
-                .setMarkerAnnotation(MOCK)
+                .setMarkerAnnotation(_mockitoAnnotation)
                 .build();
     }
 
     @Override
     public int getRelevance() {
-        if (_selectedNode.getIdentifier().toLowerCase().endsWith("mock")) {
+        if (_selectedNode.getIdentifier().toLowerCase().endsWith(_mockitoAnnotation.toLowerCase())) {
             return 98;
         }
         return super.getRelevance();

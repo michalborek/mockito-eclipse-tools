@@ -30,11 +30,11 @@ import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
 import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
-public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
+public class AddLocalMockitoProposal extends ASTRewriteCorrectionProposal {
 
     private static final String MOCKITO_PACKAGE = "org.mockito.Mockito";
-    private static final String MOCK_METHOD_NAME = "mock";
-
+    
+    private final String _mockitoMethodName;
     private final SimpleName _selectedNode;
     private final CompilationUnit _astRoot;
     private final AST _ast;
@@ -44,13 +44,14 @@ public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
     private ExpressionStatement _initLocalMockExpression;
     private ASTRewrite _rewrite;
 
-    public AddLocalMockProposal(final ICompilationUnit cu, final SimpleName selectedNode,
-            final CompilationUnit astRoot) {
-        super("Create local mock", cu, null, 0);
+    public AddLocalMockitoProposal(final ICompilationUnit cu, final SimpleName selectedNode,
+            final CompilationUnit astRoot, String mockitoMethodName) {
+        super("Create local "+ mockitoMethodName, cu, null, 0);
         _selectedNode = selectedNode;
         _astRoot = astRoot;
         _ast = selectedNode.getAST();
         _methodBody = new AstResolver().findParentOfType(selectedNode, MethodDeclaration.class);
+        _mockitoMethodName = mockitoMethodName;
     }
 
     @Override
@@ -95,7 +96,7 @@ public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
     }
 
     private void setMockMethodInvocation(final ITypeBinding typeBinding) {
-        importStaticMethod(MOCKITO_PACKAGE, MOCK_METHOD_NAME);
+        importStaticMethod(MOCKITO_PACKAGE, _mockitoMethodName);
         _initLocalMockExpression = _ast.newExpressionStatement(createMockAssignment(importType(typeBinding)));
     }
 
@@ -109,7 +110,7 @@ public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
     @SuppressWarnings("unchecked")
     private MethodInvocation createMockMethodInvocation(final Type type) {
         final MethodInvocation result = _ast.newMethodInvocation();
-        result.setName(_ast.newSimpleName(MOCK_METHOD_NAME));
+        result.setName(_ast.newSimpleName(_mockitoMethodName));
         result.arguments().add(getTypeLiteral(type));
         return result;
     }
