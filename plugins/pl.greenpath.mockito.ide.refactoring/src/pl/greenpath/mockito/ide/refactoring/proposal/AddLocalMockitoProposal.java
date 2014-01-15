@@ -34,7 +34,6 @@ public class AddLocalMockitoProposal extends ASTRewriteCorrectionProposal {
 
     private static final String MOCKITO_PACKAGE = "org.mockito.Mockito";
     
-    private final String _mockitoMethodName;
     private final SimpleName _selectedNode;
     private final CompilationUnit _astRoot;
     private final AST _ast;
@@ -43,15 +42,16 @@ public class AddLocalMockitoProposal extends ASTRewriteCorrectionProposal {
     private ContextSensitiveImportRewriteContext _importRewriteContext;
     private ExpressionStatement _initLocalMockExpression;
     private ASTRewrite _rewrite;
+    private ProposalStrategy _proposalStrategy;
 
     public AddLocalMockitoProposal(final ICompilationUnit cu, final SimpleName selectedNode,
-            final CompilationUnit astRoot, String mockitoMethodName) {
-        super("Create local "+ mockitoMethodName, cu, null, 0);
+            final CompilationUnit astRoot, final  ProposalStrategy proposalStrategy) {
+        super("Create local "+ proposalStrategy.getMockitoMethodName(), cu, null, 0);
         _selectedNode = selectedNode;
         _astRoot = astRoot;
         _ast = selectedNode.getAST();
         _methodBody = new AstResolver().findParentOfType(selectedNode, MethodDeclaration.class);
-        _mockitoMethodName = mockitoMethodName;
+        _proposalStrategy = proposalStrategy;
     }
 
     @Override
@@ -87,16 +87,8 @@ public class AddLocalMockitoProposal extends ASTRewriteCorrectionProposal {
                 _initLocalMockExpression, currentStatement, null);
     }
 
-    private VariableDeclarationExpression createVariable(final Type type) {
-        final VariableDeclarationFragment fragment = _ast.newVariableDeclarationFragment();
-        fragment.setName(_ast.newSimpleName(_selectedNode.getIdentifier()));
-        final VariableDeclarationExpression variable = _ast.newVariableDeclarationExpression(fragment);
-        variable.setType((Type) ASTNode.copySubtree(_ast, type));
-        return variable;
-    }
-
     private void setMockMethodInvocation(final ITypeBinding typeBinding) {
-        importStaticMethod(MOCKITO_PACKAGE, _mockitoMethodName);
+        importStaticMethod(MOCKITO_PACKAGE, _proposalStrategy.getMockitoMethodName());
         _initLocalMockExpression = _ast.newExpressionStatement(createMockAssignment(importType(typeBinding)));
     }
 
@@ -106,27 +98,21 @@ public class AddLocalMockitoProposal extends ASTRewriteCorrectionProposal {
         result.setRightHandSide(createMockMethodInvocation(type));
         return result;
     }
+    
+    private VariableDeclarationExpression createVariable(final Type type) {
+        final VariableDeclarationFragment fragment = _ast.newVariableDeclarationFragment();
+        fragment.setName(_ast.newSimpleName(_proposalStrategy.getVariableIdentifier()));
+        final VariableDeclarationExpression variable = _ast.newVariableDeclarationExpression(fragment);
+        variable.setType((Type) ASTNode.copySubtree(_ast, type));
+        return variable;
+    }
 
     @SuppressWarnings("unchecked")
     private MethodInvocation createMockMethodInvocation(final Type type) {
         final MethodInvocation result = _ast.newMethodInvocation();
-        result.setName(_ast.newSimpleName(_mockitoMethodName));
-        result.arguments().add(getTypeLiteral(type));
+        result.setName(_ast.newSimpleName(_proposalStrategy.getMockitoMethodName()));
+        result.arguments().add(_proposalStrategy.getArgument(type));
         return result;
-    }
-
-    private TypeLiteral getTypeLiteral(final Type type) {
-        final TypeLiteral result = _ast.newTypeLiteral();
-        result.setType((Type) ASTNode.copySubtree(_ast, getTypeForTypeLiteral(type)));
-        return result;
-    }
-
-    private Type getTypeForTypeLiteral(final Type type) {
-        if (type.isParameterizedType()) {
-            return ((ParameterizedType) type).getType();
-        } else {
-            return type;
-        }
     }
 
     private Type importType(final ITypeBinding typeBinding) {

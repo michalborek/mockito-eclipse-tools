@@ -40,7 +40,6 @@ import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefac
 public class AddLocalMockProposalTest {
     
     private static final String PROJECT_NAME = "test-project";
-    private static final String MOCK_METHOD_NAME = "mock";
 
     private static ICompilationUnit _cu;
     private TypeDeclaration _type;
@@ -71,7 +70,7 @@ public class AddLocalMockProposalTest {
         final ExpressionStatement invocationStatement = (ExpressionStatement) aMethod.getBody().statements().get(0);
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
         final SimpleName selectedNode = (SimpleName) bMethodInvocation.arguments().get(0);
-        final AddLocalMockitoProposal testedClass = new AddLocalMockitoProposal(_cu, selectedNode, _astCu, MOCK_METHOD_NAME);
+        final AddLocalMockitoProposal testedClass = new AddLocalMockitoProposal(_cu, selectedNode, _astCu, new MockProposalStrategy(selectedNode));
 
         final List rewrittenList = testedClass.getRewrite().getListRewrite(aMethod.getBody(), Block.STATEMENTS_PROPERTY).getRewrittenList();
         final Object result = rewrittenList.get(0);
@@ -93,7 +92,7 @@ public class AddLocalMockProposalTest {
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
         final SimpleName selectedNode = (SimpleName) bMethodInvocation.arguments().get(0);
         
-        final AddLocalMockitoProposal testedClass = new AddLocalMockitoProposal(_cu, selectedNode, _astCu, MOCK_METHOD_NAME);
+        final AddLocalMockitoProposal testedClass = new AddLocalMockitoProposal(_cu, selectedNode, _astCu, new MockProposalStrategy(selectedNode));
         
         assertEquals(99, testedClass.getRelevance());
     }
@@ -105,7 +104,7 @@ public class AddLocalMockProposalTest {
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
         final SimpleName selectedNode = (SimpleName) bMethodInvocation.arguments().get(0);
         
-        final AddLocalMockitoProposal testedClass = new AddLocalMockitoProposal(_cu, selectedNode, _astCu, MOCK_METHOD_NAME);
+        final AddLocalMockitoProposal testedClass = new AddLocalMockitoProposal(_cu, selectedNode, _astCu, new MockProposalStrategy(selectedNode));
         
         assertTrue(testedClass.getRelevance() < 90);
     }
@@ -117,7 +116,7 @@ public class AddLocalMockProposalTest {
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
         final SimpleName selectedNode = (SimpleName) bMethodInvocation.arguments().get(0);
         
-        final AddLocalMockitoProposal testedClass = new AddLocalMockitoProposal(_cu, selectedNode, _astCu, MOCK_METHOD_NAME);
+        final AddLocalMockitoProposal testedClass = new AddLocalMockitoProposal(_cu, selectedNode, _astCu, new MockProposalStrategy(selectedNode));
         
         assertNotNull(testedClass.getImage());
     }
