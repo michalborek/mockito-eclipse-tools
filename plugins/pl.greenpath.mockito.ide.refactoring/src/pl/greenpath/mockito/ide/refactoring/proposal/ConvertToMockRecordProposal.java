@@ -15,7 +15,12 @@ import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRewriteContext;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.text.java.correction.ASTRewriteCorrectionProposal;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 import pl.greenpath.mockito.ide.refactoring.PluginImages;
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
@@ -23,6 +28,7 @@ import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefac
 
 public class ConvertToMockRecordProposal extends ASTRewriteCorrectionProposal {
 
+    private static final String THEN_RETURN = "thenReturn(";
     private static final String MOCKITO_PACKAGE = "org.mockito.Mockito";
     private static final String MOCK_METHOD_NAME = "when";
 
@@ -33,7 +39,6 @@ public class ConvertToMockRecordProposal extends ASTRewriteCorrectionProposal {
     private ContextSensitiveImportRewriteContext _importRewriteContext;
     private Expression _initLocalMockExpression;
     private ASTRewrite _rewrite;
-    private int _start;
 
     public ConvertToMockRecordProposal(final ICompilationUnit cu, final ASTNode selectedNode,
             final CompilationUnit astRoot) {
@@ -97,6 +102,27 @@ public class ConvertToMockRecordProposal extends ASTRewriteCorrectionProposal {
 
     private String importStaticMethod(final String qualifiedName, final String methodName) {
         return getImportRewrite().addStaticImport(qualifiedName, methodName, false, _importRewriteContext);
+    }
+
+    @Override
+    protected void performChange(final IEditorPart activeEditor, final IDocument document) throws CoreException {
+        super.performChange(activeEditor, document);
+        if (activeEditor != null) {
+            putCursorIntoThenReturnMethodBody(activeEditor);
+        }
+    }
+
+    private void putCursorIntoThenReturnMethodBody(final IEditorPart activeEditor) {
+        final AbstractTextEditor editor = (AbstractTextEditor) activeEditor;
+        final ISelectionProvider selectionProvider = editor.getSelectionProvider();
+        if (!selectionProvider.getSelection().isEmpty()) {
+            selectionProvider.setSelection(getAfterFixSelection((TextSelection) selectionProvider.getSelection()));
+        }
+    }
+
+    private TextSelection getAfterFixSelection(final TextSelection initialSelection) {
+        return new TextSelection(initialSelection.getOffset() + initialSelection.getText().indexOf(THEN_RETURN)
+                + THEN_RETURN.length(), 0);
     }
 
 }
