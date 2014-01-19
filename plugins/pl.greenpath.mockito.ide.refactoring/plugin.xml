@@ -8,5 +8,18 @@
             id="pl.greenpath.mockito.ide.refactoring.quickFixProcessor1">
       </quickFixProcessor>
    </extension>
-
+   <extension
+         point="org.eclipse.jdt.ui.quickAssistProcessors">
+      <quickAssistProcessor
+            class="pl.greenpath.mockito.ide.refactoring.assisst.MocksQuickAssistProcessor"
+            id="pl.greenpath.mockito.ide.refactoring.quickAssistProcessor">
+		   <enablement>
+           <with variable="projectNatures">
+              <iterate operator="or">
+                 <equals value="org.eclipse.jdt.core.javanature"></equals>
+              </iterate>
+           </with>
+		   </enablement>
+      </quickAssistProcessor>
+   </extension>
 </plugin>

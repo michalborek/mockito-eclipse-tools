@@ -34,21 +34,8 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
             } else if (canConvertWhenThenReturn(context, location)) {
                 corrections.add(getConvertToMockRecord(context, location));
             }
-            else if (isLocalMockDefinition(context)) {
-                corrections.add(getMockConversionProposal(context, location));
-            }
         }
         return corrections.toArray(new IJavaCompletionProposal[0]);
-    }
-
-    private IJavaCompletionProposal getMockConversionProposal(final IInvocationContext context,
-            final IProblemLocation location) {
-        return null; // TODO
-    }
-
-    private boolean isLocalMockDefinition(final IInvocationContext context) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     private boolean isUnresolvedVariable(final int problemId) {
