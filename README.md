@@ -22,4 +22,4 @@ http://marketplace.eclipse.org/content/mockito-quick-fix-tools
 
 ## Continuous integration
 
-Thanks for [Travis CI](http://travis-ci.org) for free CI instance
+Thanks to [Travis CI](http://travis-ci.org) for free CI instance
