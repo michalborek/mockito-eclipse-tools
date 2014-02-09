@@ -1,17 +1,22 @@
 package pl.greenpath.mockito.ide.refactoring.assisst;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.internal.core.ResolvedBinaryField;
 import org.eclipse.jdt.ui.text.java.IInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IProblemLocation;
@@ -84,29 +89,61 @@ public class MocksQuickAssistProcessor implements IQuickAssistProcessor {
     	return new AddLocalMockitoProposal(context.getCompilationUnit(),(SimpleName)coveredNode,context.getASTRoot(), 
     			new SpyProposalStrategy((SimpleName)coveredNode));
     	
-    	
     }
     
     private boolean isConvertToSpyPossile(final IInvocationContext context) {
         
     	ASTNode coveringNode = context.getCoveringNode();
     	
-    	
     	if(coveringNode.getNodeType() == ASTNode.SIMPLE_NAME){
     		SimpleName simpleName = (SimpleName) coveringNode;
     		IBinding resolveBinding = simpleName.resolveBinding();
-    		IJavaElement javaElement = resolveBinding.getJavaElement();
-    		if(!(javaElement instanceof ResolvedBinaryField)){
-    			return false;
-    		}
-			if (hasFieldWithName(simpleName)) {
-    			return false;
-    		}
     		
+    		if(resolveBinding == null){
+    			return false;
+    		}
+    		if(resolveBinding.getKind() != IBinding.VARIABLE){
+    			return false;
+    		}
+			if (hasLocalFieldWithName(simpleName, simpleName.getIdentifier()+"Spy")) {
+    			return false;
+    		}
+			if (!isInvokedInsideMethod(simpleName)) {
+				return false;
+			}
+			if (!hasAssigment(simpleName)) {
+				return false;
+			}
     		return true;
     	}
-    	
     	return false;
     }
+    
+    private boolean hasAssigment(SimpleName simpleName) {
+    	Assignment assignment = new AstResolver().findParentOfType(simpleName, Assignment.class);
+    	return assignment != null;
+	}
+
+	private boolean isInvokedInsideMethod(SimpleName simpleName) {
+    	MethodDeclaration methodDeclaration = new AstResolver().findParentOfType(simpleName, MethodDeclaration.class);
+    	
+		return methodDeclaration != null;
+	}
+
+	private boolean hasLocalFieldWithName(SimpleName selection, String newName) {
+		
+		MethodDeclaration methodDeclaration = new AstResolver().findParentOfType(selection, MethodDeclaration.class);
+		Block body = methodDeclaration.getBody();
+		
+		for (Statement statement : (List<Statement>) body.statements()) {
+			if( Statement.VARIABLE_DECLARATION_STATEMENT == statement.getNodeType()){
+				final VariableDeclarationFragment fragment = (VariableDeclarationFragment) ((VariableDeclarationStatement)statement).fragments().get(0);
+				if(fragment.getName().getIdentifier().equals(newName)){
+					return true;
+				}
+			}
+		}
+        return false;
+	}
 
 }
