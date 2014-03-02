@@ -40,7 +40,7 @@ public class MocksQuickAssistProcessor implements IQuickAssistProcessor {
         if (isConvertToFieldPossile(context)) {
             return new IJavaCompletionProposal[] { getConvertToMockAssist(context) };
         }
-        else if(isConvertToSpyPossile(context)){
+        else if(isConvertToSpyPossile(context.getCoveringNode())){
         	return new IJavaCompletionProposal[] { getConvertToSpyAssist(context) };
         }
         return new IJavaCompletionProposal[0];
@@ -84,28 +84,22 @@ public class MocksQuickAssistProcessor implements IQuickAssistProcessor {
 
     public IJavaCompletionProposal getConvertToSpyAssist(final IInvocationContext context) {
     	
-    	ASTNode coveredNode = context.getCoveringNode();
-    	
-    	return new AddLocalMockitoProposal(context.getCompilationUnit(),(SimpleName)coveredNode,context.getASTRoot(), 
-    			new SpyProposalStrategy((SimpleName)coveredNode));
+    	SimpleName coveredNode = (SimpleName) context.getCoveringNode();
+		return new AddLocalMockitoProposal(context.getCompilationUnit(), coveredNode, context.getASTRoot(), 
+				new SpyProposalStrategy(coveredNode));
     	
     }
     
-    private boolean isConvertToSpyPossile(final IInvocationContext context) {
+    private boolean isConvertToSpyPossile(final ASTNode coveringNode) {
         
-    	ASTNode coveringNode = context.getCoveringNode();
-    	
     	if(coveringNode.getNodeType() == ASTNode.SIMPLE_NAME){
     		SimpleName simpleName = (SimpleName) coveringNode;
     		IBinding resolveBinding = simpleName.resolveBinding();
     		
-    		if(resolveBinding == null){
+    		if(resolveBinding == null || resolveBinding.getKind() != IBinding.VARIABLE){
     			return false;
     		}
-    		if(resolveBinding.getKind() != IBinding.VARIABLE){
-    			return false;
-    		}
-			if (hasLocalFieldWithName(simpleName, simpleName.getIdentifier()+"Spy")) {
+			if (hasLocalFieldWithName(simpleName, simpleName.getIdentifier() + "Spy")) {
     			return false;
     		}
 			if (!isInvokedInsideMethod(simpleName)) {
@@ -119,31 +113,27 @@ public class MocksQuickAssistProcessor implements IQuickAssistProcessor {
     	return false;
     }
     
+    private boolean hasLocalFieldWithName(SimpleName selection, String newName) {
+    	
+    	MethodDeclaration methodDeclaration = new AstResolver().findParentOfType(selection, MethodDeclaration.class);
+    	for (Statement statement : (List<Statement>) methodDeclaration.getBody().statements()) {
+    		if( Statement.VARIABLE_DECLARATION_STATEMENT == statement.getNodeType()){
+    			final VariableDeclarationFragment fragment = (VariableDeclarationFragment) ((VariableDeclarationStatement)statement).fragments().get(0);
+    			if(fragment.getName().getIdentifier().equals(newName)){
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
+
+    private boolean isInvokedInsideMethod(SimpleName simpleName) {
+    	MethodDeclaration methodDeclaration = new AstResolver().findParentOfType(simpleName, MethodDeclaration.class);
+    	return methodDeclaration != null;
+    }
+    
     private boolean hasAssigment(SimpleName simpleName) {
     	Assignment assignment = new AstResolver().findParentOfType(simpleName, Assignment.class);
     	return assignment != null;
 	}
-
-	private boolean isInvokedInsideMethod(SimpleName simpleName) {
-    	MethodDeclaration methodDeclaration = new AstResolver().findParentOfType(simpleName, MethodDeclaration.class);
-    	
-		return methodDeclaration != null;
-	}
-
-	private boolean hasLocalFieldWithName(SimpleName selection, String newName) {
-		
-		MethodDeclaration methodDeclaration = new AstResolver().findParentOfType(selection, MethodDeclaration.class);
-		Block body = methodDeclaration.getBody();
-		
-		for (Statement statement : (List<Statement>) body.statements()) {
-			if( Statement.VARIABLE_DECLARATION_STATEMENT == statement.getNodeType()){
-				final VariableDeclarationFragment fragment = (VariableDeclarationFragment) ((VariableDeclarationStatement)statement).fragments().get(0);
-				if(fragment.getName().getIdentifier().equals(newName)){
-					return true;
-				}
-			}
-		}
-        return false;
-	}
-
 }
