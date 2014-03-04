@@ -16,8 +16,11 @@ import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IQuickFixProcessor;
 
-import pl.greenpath.mockito.ide.refactoring.proposal.AddLocalMockProposal;
-import pl.greenpath.mockito.ide.refactoring.proposal.AddMockFieldProposal;
+import pl.greenpath.mockito.ide.refactoring.proposal.AddLocalMockitoProposal;
+import pl.greenpath.mockito.ide.refactoring.proposal.AddMockitoFieldProposal;
+import pl.greenpath.mockito.ide.refactoring.proposal.MockProposalStrategy;
+import pl.greenpath.mockito.ide.refactoring.proposal.ProposalStrategy;
+import pl.greenpath.mockito.ide.refactoring.proposal.SpyProposalStrategy;
 import pl.greenpath.mockito.ide.refactoring.proposal.ConvertToMockRecordProposal;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
@@ -51,8 +54,9 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
             final IProblemLocation location) {
         try {
             return Arrays.asList(
-                    getAddFieldMockProposal(context, location),
-                    getAddLocalMockProposal(context, location));
+                    getAddFieldMockitoProposal(context, location, "Mock"),
+                    getAddFieldMockitoProposal(context, location, "Spy"),
+            		getAddLocalMockitoProposal(context, location, new MockProposalStrategy(getSelectedNode(context, location))));
         } catch (final NotSupportedRefactoring e) {
             // TODO logging
             e.printStackTrace();
@@ -60,23 +64,26 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
         }
     }
 
-    private IJavaCompletionProposal getAddLocalMockProposal(final IInvocationContext context,
-            final IProblemLocation location) throws NotSupportedRefactoring {
-        final ASTNode selectedNode = location.getCoveredNode(context.getASTRoot());
-        if (selectedNode.getNodeType() != ASTNode.SIMPLE_NAME) {
-            throw new NotSupportedRefactoring("This selection is not supported by this refactoring");
-        }
-        return new AddLocalMockProposal(context.getCompilationUnit(), (SimpleName) selectedNode, context.getASTRoot());
+    private IJavaCompletionProposal getAddLocalMockitoProposal(final IInvocationContext context,
+            final IProblemLocation location, ProposalStrategy proposalStrategy) throws NotSupportedRefactoring {
+        final SimpleName selectedNode = getSelectedNode(context, location);
+        return new AddLocalMockitoProposal(context.getCompilationUnit(), selectedNode, context.getASTRoot(), proposalStrategy);
     }
 
-    private AddMockFieldProposal getAddFieldMockProposal(final IInvocationContext context,
-            final IProblemLocation location)
-            throws NotSupportedRefactoring {
-        final ASTNode selectedNode = location.getCoveredNode(context.getASTRoot());
+	private SimpleName getSelectedNode(final IInvocationContext context,
+			final IProblemLocation location) throws NotSupportedRefactoring {
+		final ASTNode selectedNode = location.getCoveredNode(context.getASTRoot());
         if (selectedNode.getNodeType() != ASTNode.SIMPLE_NAME) {
             throw new NotSupportedRefactoring("This selection is not supported by this refactoring");
         }
-        return new AddMockFieldProposal(context.getCompilationUnit(), (SimpleName) selectedNode, context.getASTRoot());
+		return (SimpleName) selectedNode;
+	}
+
+    private AddMockitoFieldProposal getAddFieldMockitoProposal(final IInvocationContext context,
+            final IProblemLocation location, String mockitoAnnotation)
+            throws NotSupportedRefactoring {
+        final ASTNode selectedNode = getSelectedNode(context, location);
+        return new AddMockitoFieldProposal(context.getCompilationUnit(), (SimpleName) selectedNode, context.getASTRoot(), mockitoAnnotation);
     }
 
     private IJavaCompletionProposal getConvertToMockRecord(final IInvocationContext context, final IProblemLocation location) {
