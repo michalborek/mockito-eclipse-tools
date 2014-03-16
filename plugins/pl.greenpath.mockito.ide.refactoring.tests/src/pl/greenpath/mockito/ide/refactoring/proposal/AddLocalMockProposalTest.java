@@ -35,6 +35,7 @@ import org.junit.Test;
 
 import pl.greenpath.mockito.ide.refactoring.ASTTesting;
 import pl.greenpath.mockito.ide.refactoring.TestProjectHelper;
+import pl.greenpath.mockito.ide.refactoring.proposal.strategy.MockProposalStrategy;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
 public class AddLocalMockProposalTest {
@@ -64,6 +65,7 @@ public class AddLocalMockProposalTest {
         _type = (TypeDeclaration) _astCu.types().get(0);
     }
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void shouldCreateMockOfSpecifiedType() throws NotSupportedRefactoring, CoreException {
         final MethodDeclaration aMethod = _type.getMethods()[0];

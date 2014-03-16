@@ -3,7 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Refactoring tools for Mockito
 Bundle-SymbolicName: pl.greenpath.mockito.ide.refactoring;singleton:=true
 Bundle-Version: 1.2.0.qualifier
-Bundle-Activator: pl.greenpath.mockito.ide.refactoring.Activator
 Bundle-Vendor: Michal Borek
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.views,
@@ -16,3 +15,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench.texteditor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Bundle-Activator: pl.greenpath.mockito.ide.refactoring.Activator

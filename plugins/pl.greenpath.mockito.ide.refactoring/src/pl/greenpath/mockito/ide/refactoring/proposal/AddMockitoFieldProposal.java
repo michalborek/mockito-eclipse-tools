@@ -22,22 +22,22 @@ public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
     private static final String MOCKITO_JUNIT_RUNNER = "org.mockito.runners.MockitoJUnitRunner";
     private static final String MOCKITO_PACKAGE = "org.mockito.";
     private static final String RUN_WITH = "org.junit.runner.RunWith";
-    private final SimpleName _selectedNode;
-    private final CompilationUnit _astRoot;
-    private final String _mockitoAnnotation;
+    private final SimpleName selectedNode;
+    private final CompilationUnit astRoot;
+    private final String mockitoAnnotation;
 
     public AddMockitoFieldProposal(final ICompilationUnit cu, final SimpleName selectedNode,
-            final CompilationUnit astRoot, String mockitoAnnotation) {
+            final CompilationUnit astRoot, final String mockitoAnnotation) {
         super("Create field " + mockitoAnnotation, cu, null, 0);
-        _selectedNode = selectedNode;
-        _astRoot = astRoot;
-        _mockitoAnnotation = MOCKITO_PACKAGE + mockitoAnnotation;
+        this.selectedNode = selectedNode;
+        this.astRoot = astRoot;
+        this.mockitoAnnotation = MOCKITO_PACKAGE + mockitoAnnotation;
     }
 
     @Override
     protected ASTRewrite getRewrite() throws CoreException {
-        final ASTRewrite rewrite = ASTRewrite.create(_selectedNode.getAST());
-        createImportRewrite(_astRoot);
+        final ASTRewrite rewrite = ASTRewrite.create(selectedNode.getAST());
+        createImportRewrite(astRoot);
         try {
             addMissingFieldDeclaration(rewrite);
         } catch (final NotSupportedRefactoring e) {
@@ -49,7 +49,7 @@ public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
     }
 
     private void addRunWithAnnotation(final ASTRewrite rewrite) {
-        new TypeSingleMemberAnnotationBuilder(new BindingFinder().getParentTypeBinding(_selectedNode), _astRoot,
+        new TypeSingleMemberAnnotationBuilder(new BindingFinder().getParentTypeBinding(selectedNode), astRoot,
                 rewrite, getImportRewrite())
                 .setQualifiedName(RUN_WITH)
                 .setValue(MOCKITO_JUNIT_RUNNER)
@@ -57,16 +57,16 @@ public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
     }
 
     private void addMissingFieldDeclaration(final ASTRewrite rewrite) throws NotSupportedRefactoring {
-        new FieldDeclarationBuilder(_selectedNode, _astRoot, rewrite, getImportRewrite())
-                .setType(new ContextBaseTypeFinder(_selectedNode).find())
+        new FieldDeclarationBuilder(selectedNode, astRoot, rewrite, getImportRewrite())
+                .setType(new ContextBaseTypeFinder(selectedNode).find())
                 .setModifiers(ModifierKeyword.PRIVATE_KEYWORD)
-                .setMarkerAnnotation(_mockitoAnnotation)
+                .setMarkerAnnotation(mockitoAnnotation)
                 .build();
     }
 
     @Override
     public int getRelevance() {
-        if (_selectedNode.getIdentifier().toLowerCase().endsWith(_mockitoAnnotation.toLowerCase())) {
+        if (selectedNode.getIdentifier().toLowerCase().endsWith(mockitoAnnotation.toLowerCase())) {
             return 98;
         }
         return super.getRelevance();

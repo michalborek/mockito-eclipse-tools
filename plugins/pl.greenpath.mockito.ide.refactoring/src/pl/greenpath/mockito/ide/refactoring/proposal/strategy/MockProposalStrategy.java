@@ -1,4 +1,4 @@
-package pl.greenpath.mockito.ide.refactoring.proposal;
+package pl.greenpath.mockito.ide.refactoring.proposal.strategy;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -9,20 +9,20 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
 
 public class MockProposalStrategy implements ProposalStrategy {
 
-	private  SimpleName _selectedNode;
-	private final AST _ast;
+	private final  SimpleName selectedNode;
+	private final AST ast;
 	private final static String MOCKITO_METHOD_NAME = "mock";
 	
 	public MockProposalStrategy(final SimpleName selectedNode) {
-		_selectedNode = selectedNode;
-		_ast = selectedNode.getAST();
+		this.selectedNode = selectedNode;
+		ast = selectedNode.getAST();
 	}
 	
 
 	@Override
 	public Object getArgument(final Type type) {
-        final TypeLiteral result = _ast.newTypeLiteral();
-        result.setType((Type) ASTNode.copySubtree(_ast, getTypeForTypeLiteral(type)));
+        final TypeLiteral result = ast.newTypeLiteral();
+        result.setType((Type) ASTNode.copySubtree(ast, getTypeForTypeLiteral(type)));
         return result;
     }
 	
@@ -42,6 +42,6 @@ public class MockProposalStrategy implements ProposalStrategy {
 
 	@Override
 	public String getVariableIdentifier() {
-		return _selectedNode.getIdentifier();
+		return this.selectedNode.getIdentifier();
 	}
 }

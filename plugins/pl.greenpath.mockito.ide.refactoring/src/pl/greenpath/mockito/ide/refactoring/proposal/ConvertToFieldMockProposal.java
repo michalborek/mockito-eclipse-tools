@@ -28,22 +28,22 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
     private static final String MOCK = "org.mockito.Mock";
     private static final String MOCKITO_JUNIT_RUNNER = "org.mockito.runners.MockitoJUnitRunner";
     private static final String RUN_WITH = "org.junit.runner.RunWith";
-    private final VariableDeclarationStatement _selectedStatement;
-    private final CompilationUnit _astRoot;
-    private final MethodDeclaration _methodBodyDeclaration;
+    private final VariableDeclarationStatement selectedStatement;
+    private final CompilationUnit astRoot;
+    private final MethodDeclaration methodBodyDeclaration;
 
     public ConvertToFieldMockProposal(final ICompilationUnit cu, final VariableDeclarationStatement selectedNode,
             final CompilationUnit astRoot) {
         super("Convert to field mock", cu, null, 0);
-        _selectedStatement = selectedNode;
-        _astRoot = astRoot;
-        _methodBodyDeclaration = new AstResolver().findParentOfType(selectedNode, MethodDeclaration.class);
+        this.selectedStatement = selectedNode;
+        this.astRoot = astRoot;
+        this.methodBodyDeclaration = new AstResolver().findParentOfType(selectedNode, MethodDeclaration.class);
     }
 
     @Override
     protected ASTRewrite getRewrite() throws CoreException {
-        final ASTRewrite rewrite = ASTRewrite.create(_selectedStatement.getAST());
-        createImportRewrite(_astRoot);
+        final ASTRewrite rewrite = ASTRewrite.create(selectedStatement.getAST());
+        createImportRewrite(astRoot);
         addMissingFieldDeclaration(rewrite);
         addRunWithAnnotation(rewrite);
         removeStatement(rewrite);
@@ -51,13 +51,13 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
     }
 
     private void removeStatement(final ASTRewrite rewrite) throws CoreException {
-        final ListRewrite list = rewrite.getListRewrite(_methodBodyDeclaration.getBody(), Block.STATEMENTS_PROPERTY);
-        list.remove(new AstResolver().findParentOfType(_selectedStatement, Statement.class), null);
+        final ListRewrite list = rewrite.getListRewrite(methodBodyDeclaration.getBody(), Block.STATEMENTS_PROPERTY);
+        list.remove(new AstResolver().findParentOfType(selectedStatement, Statement.class), null);
     }
 
     private void addRunWithAnnotation(final ASTRewrite rewrite) {
-        new TypeSingleMemberAnnotationBuilder(new BindingFinder().getParentTypeBinding(_methodBodyDeclaration),
-                _astRoot,
+        new TypeSingleMemberAnnotationBuilder(new BindingFinder().getParentTypeBinding(methodBodyDeclaration),
+                astRoot,
                 rewrite, getImportRewrite())
                 .setQualifiedName(RUN_WITH)
                 .setValue(MOCKITO_JUNIT_RUNNER)
@@ -66,10 +66,10 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
 
     private void addMissingFieldDeclaration(final ASTRewrite rewrite) {
         final VariableDeclarationFragment declaration =
-                ((VariableDeclarationFragment) _selectedStatement.fragments().get(0));
-        final FieldDeclarationBuilder builder = new FieldDeclarationBuilder(declaration.getName(), _astRoot, rewrite,
+                ((VariableDeclarationFragment) selectedStatement.fragments().get(0));
+        final FieldDeclarationBuilder builder = new FieldDeclarationBuilder(declaration.getName(), astRoot, rewrite,
                 getImportRewrite())
-                .setType(_selectedStatement.getType().resolveBinding())
+                .setType(selectedStatement.getType().resolveBinding())
                 .setModifiers(ModifierKeyword.PRIVATE_KEYWORD);
 
         final MethodInvocation mockMethodInvocation = (MethodInvocation) declaration.getInitializer();

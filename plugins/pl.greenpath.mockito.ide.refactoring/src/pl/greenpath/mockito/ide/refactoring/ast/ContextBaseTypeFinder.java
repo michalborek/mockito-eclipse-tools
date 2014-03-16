@@ -30,12 +30,12 @@ import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefac
  */
 public class ContextBaseTypeFinder {
 
-    private final ASTNode _selectedExpression;
-    private final ASTNode _parent;
+    private final ASTNode selectedExpression;
+    private final ASTNode parent;
 
     public ContextBaseTypeFinder(final ASTNode selectedExpression) {
-        this._selectedExpression = selectedExpression;
-        _parent = selectedExpression.getParent();
+        this.selectedExpression = selectedExpression;
+        parent = selectedExpression.getParent();
     }
 
     /**
@@ -47,31 +47,31 @@ public class ContextBaseTypeFinder {
      *             usage.
      */
     public ITypeBinding find() throws NotSupportedRefactoring {
-        switch (_parent.getNodeType()) {
+        switch (parent.getNodeType()) {
         case ASTNode.CLASS_INSTANCE_CREATION:
-            return getProposedType((ClassInstanceCreation) _parent);
+            return getProposedType((ClassInstanceCreation) parent);
         case ASTNode.METHOD_INVOCATION:
-            return getProposedType((MethodInvocation) _parent);
+            return getProposedType((MethodInvocation) parent);
         case ASTNode.ARRAY_INITIALIZER:
-            return getProposedType((ArrayInitializer) _parent);
+            return getProposedType((ArrayInitializer) parent);
         case ASTNode.ASSIGNMENT:
-            return getProposedType((Assignment) _parent);
+            return getProposedType((Assignment) parent);
         case ASTNode.RETURN_STATEMENT:
-            return getProposedType((ReturnStatement) _parent);
+            return getProposedType((ReturnStatement) parent);
         case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
-            return getProposedType((VariableDeclarationFragment) _parent);
+            return getProposedType((VariableDeclarationFragment) parent);
         }
         throw new NotSupportedRefactoring("Type of invocation not supported by this fix processor: "
-                + _parent.getClass().getName());
+                + parent.getClass().getName());
     }
 
     private int getIndexOfParameterInMethodInvocation() {
-        return getParentMembers().indexOf(_selectedExpression);
+        return getParentMembers().indexOf(selectedExpression);
     }
 
     @SuppressWarnings("rawtypes")
     private List getParentMembers() {
-        return (List) _selectedExpression.getParent().getStructuralProperty(_selectedExpression.getLocationInParent());
+        return (List) selectedExpression.getParent().getStructuralProperty(selectedExpression.getLocationInParent());
     }
 
     private ITypeBinding getProposedType(final MethodInvocation parent) {

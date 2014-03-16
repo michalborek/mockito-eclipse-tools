@@ -11,16 +11,13 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
-import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRewriteContext;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.text.java.correction.ASTRewriteCorrectionProposal;
 import org.eclipse.swt.graphics.Image;
@@ -28,48 +25,47 @@ import org.eclipse.swt.graphics.Image;
 import pl.greenpath.mockito.ide.refactoring.PluginImages;
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
 import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
+import pl.greenpath.mockito.ide.refactoring.proposal.strategy.ProposalStrategy;
 import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
 
 public class AddLocalMockitoProposal extends ASTRewriteCorrectionProposal {
 
     private static final String MOCKITO_PACKAGE = "org.mockito.Mockito";
     
-    private final SimpleName _selectedNode;
-    private final CompilationUnit _astRoot;
-    private final AST _ast;
-    private final MethodDeclaration _methodBody;
-    private ImportRewrite _importRewrite;
-    private ContextSensitiveImportRewriteContext _importRewriteContext;
-    private ExpressionStatement _initLocalMockExpression;
-    private ASTRewrite _rewrite;
-    private ProposalStrategy _proposalStrategy;
+    private final SimpleName selectedNode;
+    private final CompilationUnit astRoot;
+    private final AST ast;
+    private final MethodDeclaration methodBody;
+    private ImportRewrite importRewrite;
+    private ExpressionStatement initLocalMockExpression;
+    private ASTRewrite rewrite;
+    private final ProposalStrategy proposalStrategy;
 
     public AddLocalMockitoProposal(final ICompilationUnit cu, final SimpleName selectedNode,
             final CompilationUnit astRoot, final  ProposalStrategy proposalStrategy) {
         super("Create local "+ proposalStrategy.getMockitoMethodName(), cu, null, 0);
-        _selectedNode = selectedNode;
-        _astRoot = astRoot;
-        _ast = selectedNode.getAST();
-        _methodBody = new AstResolver().findParentOfType(selectedNode, MethodDeclaration.class);
-        _proposalStrategy = proposalStrategy;
+        this.selectedNode = selectedNode;
+        this.astRoot = astRoot;
+        this.ast = selectedNode.getAST();
+        this.methodBody = new AstResolver().findParentOfType(selectedNode, MethodDeclaration.class);
+        this.proposalStrategy = proposalStrategy;
     }
 
     @Override
     public ASTRewrite getRewrite() throws CoreException {
-        _rewrite = ASTRewrite.create(_selectedNode.getAST());
-        _importRewrite = createImportRewrite(_astRoot);
-        _importRewriteContext = new ContextSensitiveImportRewriteContext(_methodBody, _importRewrite);
+        rewrite = ASTRewrite.create(selectedNode.getAST());
+        importRewrite = createImportRewrite(astRoot);
         try {
             performFix();
         } catch (final NotSupportedRefactoring e) {
             e.printStackTrace(); // TODO logging
         }
-        return _rewrite;
+        return rewrite;
     }
 
     @Override
     public int getRelevance() {
-        if (_selectedNode.getIdentifier().toLowerCase().endsWith("mock")) {
+        if (selectedNode.getIdentifier().toLowerCase().endsWith("mock")) {
             return 99;
         }
         return super.getRelevance();
@@ -81,46 +77,46 @@ public class AddLocalMockitoProposal extends ASTRewriteCorrectionProposal {
     }
 
     public void performFix() throws NotSupportedRefactoring {
-        setMockMethodInvocation(new ContextBaseTypeFinder(_selectedNode).find());
-        final Statement currentStatement = new AstResolver().findParentOfType(_selectedNode, Statement.class);
-        _rewrite.getListRewrite(_methodBody.getBody(), Block.STATEMENTS_PROPERTY).insertBefore(
-                _initLocalMockExpression, currentStatement, null);
+        setMockMethodInvocation(new ContextBaseTypeFinder(selectedNode).find());
+        final Statement currentStatement = new AstResolver().findParentOfType(selectedNode, Statement.class);
+        rewrite.getListRewrite(methodBody.getBody(), Block.STATEMENTS_PROPERTY).insertBefore(
+                initLocalMockExpression, currentStatement, null);
     }
 
     private void setMockMethodInvocation(final ITypeBinding typeBinding) {
-        importStaticMethod(MOCKITO_PACKAGE, _proposalStrategy.getMockitoMethodName());
-        _initLocalMockExpression = _ast.newExpressionStatement(createMockAssignment(importType(typeBinding)));
+        importStaticMethod(MOCKITO_PACKAGE, proposalStrategy.getMockitoMethodName());
+        initLocalMockExpression = ast.newExpressionStatement(createMockAssignment(importType(typeBinding)));
     }
 
     private Assignment createMockAssignment(final Type type) {
-        final Assignment result = _ast.newAssignment();
+        final Assignment result = ast.newAssignment();
         result.setLeftHandSide(createVariable(type));
         result.setRightHandSide(createMockMethodInvocation(type));
         return result;
     }
     
     private VariableDeclarationExpression createVariable(final Type type) {
-        final VariableDeclarationFragment fragment = _ast.newVariableDeclarationFragment();
-        fragment.setName(_ast.newSimpleName(_proposalStrategy.getVariableIdentifier()));
-        final VariableDeclarationExpression variable = _ast.newVariableDeclarationExpression(fragment);
-        variable.setType((Type) ASTNode.copySubtree(_ast, type));
+        final VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
+        fragment.setName(ast.newSimpleName(proposalStrategy.getVariableIdentifier()));
+        final VariableDeclarationExpression variable = ast.newVariableDeclarationExpression(fragment);
+        variable.setType((Type) ASTNode.copySubtree(ast, type));
         return variable;
     }
 
     @SuppressWarnings("unchecked")
     private MethodInvocation createMockMethodInvocation(final Type type) {
-        final MethodInvocation result = _ast.newMethodInvocation();
-        result.setName(_ast.newSimpleName(_proposalStrategy.getMockitoMethodName()));
-        result.arguments().add(_proposalStrategy.getArgument(type));
+        final MethodInvocation result = ast.newMethodInvocation();
+        result.setName(ast.newSimpleName(proposalStrategy.getMockitoMethodName()));
+        result.arguments().add(proposalStrategy.getArgument(type));
         return result;
     }
 
     private Type importType(final ITypeBinding typeBinding) {
-        return _importRewrite.addImport(typeBinding, _ast, _importRewriteContext);
+        return importRewrite.addImport(typeBinding, ast);
     }
 
     private String importStaticMethod(final String qualifiedName, final String methodName) {
-        return _importRewrite.addStaticImport(qualifiedName, methodName, false, _importRewriteContext);
+        return importRewrite.addStaticImport(qualifiedName, methodName, false);
     }
 
 }

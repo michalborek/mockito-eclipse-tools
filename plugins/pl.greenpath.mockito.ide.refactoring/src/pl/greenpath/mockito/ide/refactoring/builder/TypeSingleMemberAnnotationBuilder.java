@@ -10,7 +10,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
-import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRewriteContext;
 
 public class TypeSingleMemberAnnotationBuilder {
 
@@ -44,8 +43,7 @@ public class TypeSingleMemberAnnotationBuilder {
 	}
 
 	private String addImport(final String importDefinition) {
-		final ContextSensitiveImportRewriteContext context = new ContextSensitiveImportRewriteContext(astRoot, importRewrite);
-		return importRewrite.addImport(importDefinition, context);
+		return importRewrite.addImport(importDefinition);
 	}
 
 	public void build() {

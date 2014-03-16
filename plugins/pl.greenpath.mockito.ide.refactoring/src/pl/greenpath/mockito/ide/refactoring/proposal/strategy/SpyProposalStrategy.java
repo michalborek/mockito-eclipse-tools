@@ -1,4 +1,4 @@
-package pl.greenpath.mockito.ide.refactoring.proposal;
+package pl.greenpath.mockito.ide.refactoring.proposal.strategy;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;

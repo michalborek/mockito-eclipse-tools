@@ -18,9 +18,7 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
-import org.eclipse.jdt.core.dom.rewrite.ImportRewrite.ImportRewriteContext;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
-import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRewriteContext;
 
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
 import pl.greenpath.mockito.ide.refactoring.ast.BindingFinder;
@@ -35,7 +33,6 @@ public class FieldDeclarationBuilder {
     private final AstResolver astResolver;
     private final BindingFinder bindingFinder;
     private final CompilationUnit parentClass;
-    private final ImportRewriteContext importRewriteContext;
     private Annotation annotation;
 
     public FieldDeclarationBuilder(final SimpleName variableName, final CompilationUnit parentClass,
@@ -49,7 +46,6 @@ public class FieldDeclarationBuilder {
         astResolver = new AstResolver();
         bindingFinder = new BindingFinder();
         fieldDeclaration = createFieldDeclaration();
-        importRewriteContext = new ContextSensitiveImportRewriteContext(variableName, importRewrite);
     }
 
     public void build() {
@@ -100,7 +96,7 @@ public class FieldDeclarationBuilder {
     }
 
     public FieldDeclarationBuilder setType(final ITypeBinding typeBinding) {
-        final Type type = importRewrite.addImport(typeBinding, selectedNode.getAST(), importRewriteContext);
+        final Type type = importRewrite.addImport(typeBinding, selectedNode.getAST());
         fieldDeclaration.setType(type);
         return this;
     }
@@ -120,7 +116,7 @@ public class FieldDeclarationBuilder {
     }
 
     private String importType(final String qualifiedName) {
-        return importRewrite.addImport(qualifiedName, importRewriteContext);
+        return importRewrite.addImport(qualifiedName);
     }
 
     @SuppressWarnings("unchecked")
