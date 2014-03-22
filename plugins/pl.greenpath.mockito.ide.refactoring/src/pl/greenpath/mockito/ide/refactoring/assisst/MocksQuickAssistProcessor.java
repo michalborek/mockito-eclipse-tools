@@ -97,12 +97,12 @@ public class MocksQuickAssistProcessor implements IQuickAssistProcessor {
     		if(resolveBinding == null || resolveBinding.getKind() != IBinding.VARIABLE){
     			return false;
     		}
+    		if (!isInvokedInsideMethod(simpleName)) {
+    		    return false;
+    		}
 			if (hasLocalFieldWithName(simpleName, simpleName.getIdentifier() + "Spy")) {
     			return false;
     		}
-			if (!isInvokedInsideMethod(simpleName)) {
-				return false;
-			}
 			if (!hasAssigment(simpleName)) {
 				return false;
 			}
@@ -114,6 +114,9 @@ public class MocksQuickAssistProcessor implements IQuickAssistProcessor {
     @SuppressWarnings("unchecked")
     private boolean hasLocalFieldWithName(final SimpleName selection, final String newName) {
     	final MethodDeclaration methodDeclaration = new AstResolver().findParentOfType(selection, MethodDeclaration.class);
+    	if(methodDeclaration == null) {
+    	    return false;
+    	}
     	for (final Statement statement : (List<Statement>) methodDeclaration.getBody().statements()) {
     		if( Statement.VARIABLE_DECLARATION_STATEMENT == statement.getNodeType()){
     			final VariableDeclarationFragment fragment = (VariableDeclarationFragment) ((VariableDeclarationStatement)statement).fragments().get(0);
@@ -126,12 +129,10 @@ public class MocksQuickAssistProcessor implements IQuickAssistProcessor {
     }
 
     private boolean isInvokedInsideMethod(final SimpleName simpleName) {
-    	final MethodDeclaration methodDeclaration = new AstResolver().findParentOfType(simpleName, MethodDeclaration.class);
-    	return methodDeclaration != null;
+    	return new AstResolver().findParentOfType(simpleName, MethodDeclaration.class) != null;
     }
     
     private boolean hasAssigment(final SimpleName simpleName) {
-    	final Assignment assignment = new AstResolver().findParentOfType(simpleName, Assignment.class);
-    	return assignment != null;
+    	return new AstResolver().findParentOfType(simpleName, Assignment.class) != null;
 	}
 }
