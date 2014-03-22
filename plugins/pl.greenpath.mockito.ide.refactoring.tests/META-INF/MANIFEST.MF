@@ -8,7 +8,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit,
  org.eclipse.core.resources;bundle-version="3.8.101",
  org.eclipse.ui.ide,
- org.mockito.mockito-all
+ org.mockito.mockito-all,
+ org.assertj.core;bundle-version="1.6.0"
 Bundle-Version: 1.2.0.qualifier
 Bundle-ClassPath: .
 

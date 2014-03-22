@@ -31,7 +31,7 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
     @Override
     public IJavaCompletionProposal[] getCorrections(final IInvocationContext context, final IProblemLocation[] locations)
             throws CoreException {
-        final List<IJavaCompletionProposal> corrections = new ArrayList<IJavaCompletionProposal>();
+        final List<IJavaCompletionProposal> corrections = new ArrayList<>();
 
         for (final IProblemLocation location : locations) {
             if (isUnresolvedVariable(location.getProblemId())) {
