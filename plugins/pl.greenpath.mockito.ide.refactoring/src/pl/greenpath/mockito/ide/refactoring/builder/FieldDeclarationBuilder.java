@@ -72,9 +72,8 @@ public class FieldDeclarationBuilder {
             }
             final FieldDeclaration field = (FieldDeclaration) fieldObj;
 
-            final List modifiers = (List) field.getStructuralProperty(field.getModifiersProperty());
             boolean found = false;
-            for (final Object modifier : modifiers) {
+            for (final Object modifier : (List) field.getStructuralProperty(field.getModifiersProperty())) {
                 if (modifier instanceof Annotation
                         && ((Annotation) modifier).getTypeName().getFullyQualifiedName().equals("Mock")) {
                     insertBefore = field;
@@ -122,12 +121,12 @@ public class FieldDeclarationBuilder {
     @SuppressWarnings("unchecked")
     public void setAnnotationWithExtraInterfaces(final String fullyQualifiedName, final TypeLiteral... types) {
         final NormalAnnotation normalAnnotation = ast.newNormalAnnotation();
-        
+
         normalAnnotation.setTypeName(ast.newSimpleName(importType(fullyQualifiedName)));
         final MemberValuePair newMemberValuePair = ast.newMemberValuePair();
         newMemberValuePair.setName(ast.newSimpleName("extraInterfaces"));
         final ArrayInitializer newArrayInitializer = ast.newArrayInitializer();
-        for(final TypeLiteral literal: types) {
+        for (final TypeLiteral literal : types) {
             newArrayInitializer.expressions().add(ASTNode.copySubtree(ast, literal));
         }
         newMemberValuePair.setValue(newArrayInitializer);

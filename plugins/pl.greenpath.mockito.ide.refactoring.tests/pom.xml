@@ -15,45 +15,23 @@
 	</properties>
 
 	<dependencies>
-	  <dependency>
-		<groupId>org.assertj</groupId>
-		<artifactId>assertj-core</artifactId>
-		<version>${assertj.version}</version>
-	  </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-all</artifactId>
-        <version>${mockito.version}</version>
-        <scope>compile</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>${mockito.version}</version>
-        <scope>compile</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
 		<dependency>
 			<groupId>org.eclipse.tycho</groupId>
 			<artifactId>org.eclipse.jdt.core</artifactId>
 			<version>3.9.1.v20130905-0837</version>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
-	  	<resources>
-	      <resource>
-	        <directory>${project.basedir}/test/resources</directory>
-	        <targetPath>../</targetPath>
-	      </resource>
-	      
+		<resources>
+			<resource>
+				<directory>${project.basedir}/test/resources</directory>
+				<targetPath>../</targetPath>
+			</resource>
+
 		</resources>
-		<plugins>
+		<pluginManagement>
+			<plugins>
 		    <plugin>
 	        <!-- configuration of which test suite to run -->
 	        <groupId>org.eclipse.tycho</groupId>
@@ -66,37 +44,6 @@
 	       	  <showEclipseLog>true</showEclipseLog>
 	        </configuration>
 	      </plugin>
-	      <plugin>
-	        <!-- copy the mockito jar, so it can be used in eclipse -->
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-dependency-plugin</artifactId>
-	        <executions>
-	        <execution>
-	            <id>copy</id>
-	            <phase>initialize</phase>
-	            <goals>
-	              <goal>copy</goal>
-	            </goals>
-	            <configuration>
-	              <artifactItems>
-	                <artifactItem>
-	                  <groupId>org.mockito</groupId>
-	                  <artifactId>mockito-all</artifactId>
-	                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
-	                </artifactItem>
-	                <artifactItem>
-					  <groupId>org.assertj</groupId>
-					  <artifactId>assertj-core</artifactId>
-	                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
-	                </artifactItem>
-	              </artifactItems>
-	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
-		</plugins>
-		<pluginManagement>
-			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
