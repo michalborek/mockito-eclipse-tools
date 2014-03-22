@@ -10,7 +10,7 @@ Require-Bundle: org.junit,
  org.eclipse.ui.ide,
  org.mockito.mockito-all,
  org.assertj.core;bundle-version="1.6.0"
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 1.3.0.qualifier
 Bundle-ClassPath: .
 
 

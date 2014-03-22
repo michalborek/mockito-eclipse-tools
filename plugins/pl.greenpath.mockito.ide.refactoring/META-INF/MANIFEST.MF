@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Refactoring tools for Mockito
 Bundle-SymbolicName: pl.greenpath.mockito.ide.refactoring;singleton:=true
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 1.3.0.qualifier
 Bundle-Vendor: Michal Borek
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.views,
