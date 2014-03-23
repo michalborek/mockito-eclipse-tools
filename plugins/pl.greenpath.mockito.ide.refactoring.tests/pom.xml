@@ -9,11 +9,6 @@
 		<relativePath>../../pom.xml</relativePath>
 		<groupId>pl.greenpath.mockito</groupId>
 	</parent>
-	<properties>
-		<mockito.version>1.9.5</mockito.version>
-		<assertj.version>1.4.0</assertj.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.eclipse.tycho</groupId>
@@ -40,7 +35,7 @@
 	          <testClassesDirectory>${project.build.directory}/classes</testClassesDirectory>
 	          <redirectTestOutputToFile>true</redirectTestOutputToFile>
 	          <testSuite>${project.artifactId}</testSuite>
-	          <testClass>pl.greenpath.mockito.ide.refactoring.AllTests</testClass>
+	          <testClass>**/*Test</testClass>
 	       	  <showEclipseLog>true</showEclipseLog>
 	        </configuration>
 	      </plugin>
