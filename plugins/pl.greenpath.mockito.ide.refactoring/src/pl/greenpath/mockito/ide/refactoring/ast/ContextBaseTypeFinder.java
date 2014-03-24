@@ -30,13 +30,7 @@ import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefac
  */
 public class ContextBaseTypeFinder {
 
-    private final ASTNode selectedExpression;
-    private final ASTNode parent;
-
-    public ContextBaseTypeFinder(final ASTNode selectedExpression) {
-        this.selectedExpression = selectedExpression;
-        parent = selectedExpression.getParent();
-    }
+    private ASTNode selectedExpression;
 
     /**
      * Finds best matching type for selectedExpression given in constructor
@@ -46,7 +40,9 @@ public class ContextBaseTypeFinder {
      *             when this finder does not support the context of expression
      *             usage.
      */
-    public ITypeBinding find() throws NotSupportedRefactoring {
+    public ITypeBinding find(final ASTNode selectedExpression) throws NotSupportedRefactoring {
+        this.selectedExpression = selectedExpression;
+        final ASTNode parent = selectedExpression.getParent();
         switch (parent.getNodeType()) {
         case ASTNode.CLASS_INSTANCE_CREATION:
             return getProposedType((ClassInstanceCreation) parent);
@@ -89,11 +85,11 @@ public class ContextBaseTypeFinder {
     private ITypeBinding getProposedType(final Assignment parent) {
         return parent.resolveTypeBinding();
     }
-    
+
     private ITypeBinding getProposedType(final ReturnStatement parent) {
-        return ((MethodDeclaration)parent.getParent().getParent()).getReturnType2().resolveBinding();
+        return ((MethodDeclaration) parent.getParent().getParent()).getReturnType2().resolveBinding();
     }
-    
+
     private ITypeBinding getProposedType(final VariableDeclarationFragment parent) {
         return parent.resolveBinding().getType();
     }

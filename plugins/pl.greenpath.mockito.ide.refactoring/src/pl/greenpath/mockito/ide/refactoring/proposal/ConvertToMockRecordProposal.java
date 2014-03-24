@@ -33,7 +33,7 @@ public class ConvertToMockRecordProposal extends ASTRewriteCorrectionProposal {
 
     @Override
     public ASTRewrite getRewrite() throws CoreException {
-        return new ToRecordingConverter(_selectedNode.getAST(), createImportRewrite(_astRoot), _selectedNode, _strategy)
+        return new ToRecordingConverter(createImportRewrite(_astRoot), _selectedNode, _strategy)
                 .performConversion();
     }
 

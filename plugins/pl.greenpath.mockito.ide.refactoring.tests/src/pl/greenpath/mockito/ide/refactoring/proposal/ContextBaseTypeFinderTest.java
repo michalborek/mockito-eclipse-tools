@@ -68,9 +68,9 @@ public class ContextBaseTypeFinderTest {
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
         final SimpleName testMockName = (SimpleName) bMethodInvocation.arguments().get(0);
 
-        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder(testMockName);
+        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder();
 
-        assertEquals("java.lang.String", finder.find().getQualifiedName());
+        assertEquals("java.lang.String", finder.find(testMockName).getQualifiedName());
     }
 
     @Test
@@ -84,9 +84,9 @@ public class ContextBaseTypeFinderTest {
         final ArrayCreation initializer = (ArrayCreation) fragment.getInitializer();
         final SimpleName testMockName = (SimpleName) initializer.getInitializer().expressions().get(0);
 
-        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder(testMockName);
+        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder();
 
-        assertEquals("java.lang.Double", finder.find().getQualifiedName());
+        assertEquals("java.lang.Double", finder.find(testMockName).getQualifiedName());
     }
 
     @Test
@@ -100,9 +100,9 @@ public class ContextBaseTypeFinderTest {
         final ClassInstanceCreation initializer = (ClassInstanceCreation) fragment.getInitializer();
         final SimpleName testMockName = (SimpleName) initializer.arguments().get(0);
 
-        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder(testMockName);
+        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder();
 
-        assertEquals("java.util.Collection<? extends java.lang.String>", finder.find().getQualifiedName());
+        assertEquals("java.util.Collection<? extends java.lang.String>", finder.find(testMockName).getQualifiedName());
     }
 
     @Test
@@ -112,9 +112,9 @@ public class ContextBaseTypeFinderTest {
         final Assignment assignment = (Assignment) expression.getExpression();
         final SimpleName testMockName = (SimpleName) assignment.getRightHandSide();
 
-        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder(testMockName);
+        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder();
 
-        assertEquals("int", finder.find().getQualifiedName());
+        assertEquals("int", finder.find(testMockName).getQualifiedName());
     }
 
     @Test
@@ -123,9 +123,9 @@ public class ContextBaseTypeFinderTest {
         final ReturnStatement expression = (ReturnStatement) fMethod.getBody().statements().get(0);
         final SimpleName testMockName = (SimpleName) expression.getExpression();
 
-        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder(testMockName);
+        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder();
 
-        assertEquals("java.lang.String", finder.find().getQualifiedName());
+        assertEquals("java.lang.String", finder.find(testMockName).getQualifiedName());
     }
 
     @Test
@@ -137,8 +137,8 @@ public class ContextBaseTypeFinderTest {
                 .fragments().get(0);
 
         final SimpleName testMockName = (SimpleName) fragment.getInitializer();
-        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder(testMockName);
+        final ContextBaseTypeFinder finder = new ContextBaseTypeFinder();
 
-        assertEquals("long", finder.find().getQualifiedName());
+        assertEquals("long", finder.find(testMockName).getQualifiedName());
     }
 }

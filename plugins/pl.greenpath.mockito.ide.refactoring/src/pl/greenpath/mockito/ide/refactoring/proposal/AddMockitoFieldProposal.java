@@ -58,7 +58,7 @@ public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
 
     private void addMissingFieldDeclaration(final ASTRewrite rewrite) throws NotSupportedRefactoring {
         new FieldDeclarationBuilder(selectedNode, astRoot, rewrite, getImportRewrite())
-                .setType(new ContextBaseTypeFinder(selectedNode).find())
+                .setType(new ContextBaseTypeFinder().find(selectedNode))
                 .setModifiers(ModifierKeyword.PRIVATE_KEYWORD)
                 .setMarkerAnnotation(mockitoAnnotation)
                 .build();

@@ -54,8 +54,8 @@ public class ToRecordingConverterTest {
         final ExpressionStatement selectedExpression = getMethodInvocationExpression("type", "toString");
         final MethodDeclaration method = getMethodDeclaration("testMethod", selectedExpression);
 
-        final ToRecordingConverter testedClass = new ToRecordingConverter(ast, importRewrite,
-                selectedExpression.getExpression(), strategy);
+        final ToRecordingConverter testedClass = new ToRecordingConverter(importRewrite, selectedExpression.getExpression(),
+                strategy);
 
         final ASTRewrite afterConversion = testedClass.performConversion();
         final ExpressionStatement resultExpression = (ExpressionStatement) afterConversion

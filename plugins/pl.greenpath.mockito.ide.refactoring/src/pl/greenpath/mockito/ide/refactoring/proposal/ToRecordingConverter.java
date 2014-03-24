@@ -1,7 +1,6 @@
 package pl.greenpath.mockito.ide.refactoring.proposal;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
@@ -15,20 +14,16 @@ import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
 import pl.greenpath.mockito.ide.refactoring.proposal.strategy.ConversionToRecordingStrategy;
 
-public class ToRecordingConverter {
+public class ToRecordingConverter extends ImportsModifier {
 
     private static final String MOCKITO_PACKAGE = "org.mockito.Mockito";
     private static final String MOCK_METHOD_NAME = "when";
 
-    private final AST ast;
-    private final ImportRewrite importRewrite;
     private final ConversionToRecordingStrategy strategy;
     private final ASTNode selectedNode;
 
-    public ToRecordingConverter(final AST ast, final ImportRewrite importRewrite, final ASTNode selectedNode,
-            final ConversionToRecordingStrategy strategy) {
-        this.ast = ast;
-        this.importRewrite = importRewrite;
+    public ToRecordingConverter(final ImportRewrite importRewrite, final ASTNode selectedNode, final ConversionToRecordingStrategy strategy) {
+        super(importRewrite, selectedNode.getAST());
         this.selectedNode = selectedNode;
         this.strategy = strategy;
     }
@@ -59,10 +54,6 @@ public class ToRecordingConverter {
         result.setName(ast.newSimpleName(MOCK_METHOD_NAME));
         result.arguments().add(initLocalMockExpression);
         return result;
-    }
-
-    private String importStaticMethod(final String qualifiedName, final String methodName) {
-        return importRewrite.addStaticImport(qualifiedName, methodName, false);
     }
 
     private Block getMethodBodyBlockContainingNode() {
