@@ -9,6 +9,9 @@
 		<relativePath>../../pom.xml</relativePath>
 		<groupId>pl.greenpath.mockito</groupId>
 	</parent>
+	<properties>
+		<sonar.jacoco.reportPath>${project.build.directory}/../../pl.greenpath.mockito.ide.refactoring.tests/target/jacoco.exec</sonar.jacoco.reportPath>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.eclipse.tycho</groupId>
@@ -25,21 +28,47 @@
 			</resource>
 
 		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.0.201403182114</version>
+				<executions>
+					<execution>
+						<id>prepare-integration-tests</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eluder.coveralls</groupId>
+				<artifactId>coveralls-maven-plugin</artifactId>
+				<version>2.2.0</version>
+				<configuration>
+					<repoToken>wuVTzOqx3RSPPW8Wli1oIIhB63BDWKj9l</repoToken>
+				</configuration>
+			</plugin>
+		</plugins>
 		<pluginManagement>
 			<plugins>
-		    <plugin>
-	        <!-- configuration of which test suite to run -->
-	        <groupId>org.eclipse.tycho</groupId>
-	        <artifactId>tycho-surefire-plugin</artifactId>
-	        <configuration>
-	          <testClassesDirectory>${project.build.directory}/classes</testClassesDirectory>
-	          <redirectTestOutputToFile>true</redirectTestOutputToFile>
-	          <testSuite>${project.artifactId}</testSuite>
-	          <testClass>**/*Test</testClass>
-	       	  <showEclipseLog>true</showEclipseLog>
-	        </configuration>
-	      </plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<!-- configuration of which test suite to run -->
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-surefire-plugin</artifactId>
+					<configuration>
+						<testClassesDirectory>${project.build.directory}/classes</testClassesDirectory>
+						<redirectTestOutputToFile>true</redirectTestOutputToFile>
+						<testSuite>${project.artifactId}</testSuite>
+						<testClass>**/*Test</testClass>
+						<showEclipseLog>true</showEclipseLog>
+					</configuration>
+				</plugin>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
