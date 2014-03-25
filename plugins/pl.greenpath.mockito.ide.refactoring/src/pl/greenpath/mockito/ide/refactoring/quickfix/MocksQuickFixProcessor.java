@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.ui.text.java.IInvocationContext;
@@ -16,6 +17,7 @@ import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IQuickFixProcessor;
 
+import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
 import pl.greenpath.mockito.ide.refactoring.proposal.AddLocalMockitoProposal;
 import pl.greenpath.mockito.ide.refactoring.proposal.AddMockitoFieldProposal;
 import pl.greenpath.mockito.ide.refactoring.proposal.ConvertToMockRecordProposal;
@@ -49,16 +51,19 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
     }
 
     private boolean canConvertToRecording(final IInvocationContext context, final IProblemLocation location) {
+        final ExpressionStatement statement = new AstResolver().findParentOfType(context.getCoveringNode(),
+                ExpressionStatement.class);
+
         return location.getProblemId() == IProblem.ParsingErrorInsertToComplete
-                && context.getCoveringNode() instanceof MethodInvocation;
+                && statement != null && statement.getExpression() instanceof MethodInvocation;
     }
 
     private List<IJavaCompletionProposal> getMockCreationProposals(final IInvocationContext context,
             final IProblemLocation location) {
         try {
             return Arrays.asList(
-                    getAddFieldMockitoProposal(context, location, "Mock"),
-                    getAddFieldMockitoProposal(context, location, "Spy"),
+                    getAddFieldMockitoProposal(context, location, "mock"),
+                    getAddFieldMockitoProposal(context, location, "spy"),
                     getAddLocalMockitoProposal(context, location,
                             new MockProposalStrategy(getSelectedNode(context, location))));
         } catch (final NotSupportedRefactoring e) {
@@ -94,7 +99,8 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
 
     private IJavaCompletionProposal getConvertToRecording(final IInvocationContext context,
             final IProblemLocation location, final ConversionToRecordingStrategy strategy) {
-        final ASTNode selectedNode = context.getCoveringNode();
+        final ASTNode selectedNode = new AstResolver().findParentOfType(context.getCoveringNode(),
+                MethodInvocation.class);
 
         return new ConvertToMockRecordProposal(context.getCompilationUnit(), selectedNode, context.getASTRoot(),
                 strategy);
