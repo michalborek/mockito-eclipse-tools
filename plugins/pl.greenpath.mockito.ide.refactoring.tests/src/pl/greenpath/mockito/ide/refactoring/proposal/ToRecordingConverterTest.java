@@ -40,21 +40,29 @@ public class ToRecordingConverterTest {
     }
 
     @Test
-    public void shouldConvertWithThenReturnStrategy() throws CoreException {
-        checkStrategy(new WhenThenReturnRecordingStrategy(), "when(type.toString()).thenReturn();\n");
+    public void shouldConvertParameterlessMethodInvocationWithThenReturnStrategy() throws CoreException {
+        checkConversion(new WhenThenReturnRecordingStrategy(),
+                "when(type.toString()).thenReturn();\n", getMethodInvocationExpression("type", "toString"));
+    }
+
+    @Test
+    public void shouldConvertMethodWithParametersInvocation() throws CoreException {
+        final ExpressionStatement expression = getMethodInvocationExpression("type", "equals", "x");
+        checkConversion(new WhenThenReturnRecordingStrategy(), "when(type.equals(x)).thenReturn();\n", expression);
     }
 
     @Test
     public void shouldConvertWithThenThrowStrategy() throws CoreException {
-        checkStrategy(new WhenThenThrowRecordingStrategy(), "when(type.toString()).thenThrow();\n");
+        checkConversion(new WhenThenThrowRecordingStrategy(),
+                "when(type.toString()).thenThrow();\n", getMethodInvocationExpression("type", "toString"));
     }
 
-    private void checkStrategy(final ConversionToRecordingStrategy strategy, final String resultStatement)
-            throws CoreException {
-        final ExpressionStatement selectedExpression = getMethodInvocationExpression("type", "toString");
+    private void checkConversion(final ConversionToRecordingStrategy strategy, final String resultStatement,
+            final ExpressionStatement selectedExpression) throws CoreException {
         final MethodDeclaration method = getMethodDeclaration("testMethod", selectedExpression);
 
-        final ToRecordingConverter testedClass = new ToRecordingConverter(importRewrite, selectedExpression.getExpression(),
+        final ToRecordingConverter testedClass = new ToRecordingConverter(importRewrite,
+                selectedExpression.getExpression(),
                 strategy);
 
         final ASTRewrite afterConversion = testedClass.performConversion();
@@ -76,10 +84,15 @@ public class ToRecordingConverterTest {
         return result;
     }
 
-    private ExpressionStatement getMethodInvocationExpression(final String variable, final String invokedMethod) {
+    @SuppressWarnings("unchecked")
+    private ExpressionStatement getMethodInvocationExpression(final String variable, final String invokedMethod,
+            final String... arguments) {
         final MethodInvocation methodInvocation = ast.newMethodInvocation();
         methodInvocation.setName(ast.newSimpleName(invokedMethod));
         methodInvocation.setExpression(ast.newSimpleName(variable));
+        for (final String argument : arguments) {
+            methodInvocation.arguments().add(ast.newSimpleName(argument));
+        }
         final ExpressionStatement selected = ast.newExpressionStatement(methodInvocation);
         return selected;
     }
