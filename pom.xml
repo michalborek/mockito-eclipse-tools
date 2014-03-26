@@ -169,7 +169,6 @@
 				<artifactId>coveralls-maven-plugin</artifactId>
 				<version>2.2.0</version>
 				<configuration>
-					<repoToken>wuVTzOqx3RSPPW8Wli1oIIhB63BDWKj9l</repoToken>
 					<jacocoFile>${project.basedir}/plugins/pl.greenpath.mockito.ide.refactoring.tests/target/jacoco/report/jacoco.xml</jacocoFile>
 					<sourceDirectories>
 						<sourceDirectory>${project.basedir}/plugins/pl.greenpath.mockito.ide.refactoring/src</sourceDirectory>
