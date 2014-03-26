@@ -4,4 +4,4 @@ before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
 after_success:
-  - mvn clean test jacoco:report coveralls:jacoco
+  - mvn coveralls:chain -N
