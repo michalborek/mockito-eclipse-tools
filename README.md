@@ -1,4 +1,4 @@
-mockito-eclipse-tools [![](https://travis-ci.org/michalborek/mockito-eclipse-tools.png?branch=master)](https://travis-ci.org/michalborek/mockito-eclipse-tools/)
+mockito-eclipse-tools [![](https://travis-ci.org/michalborek/mockito-eclipse-tools.png?branch=master)](https://travis-ci.org/michalborek/mockito-eclipse-tools/) [![](https://coveralls.io/repos/michalborek/mockito-eclipse-tools/badge.png?branch=master)](https://coveralls.io/r/michalborek/mockito-eclipse-tools?branch=master)
 =====================
 
 Eclipse plugin that simplifies test creation by providing refactorings for Mockito mocks.
