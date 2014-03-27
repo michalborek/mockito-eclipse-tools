@@ -1,5 +1,6 @@
 package pl.greenpath.mockito.ide.refactoring;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -13,7 +14,11 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
+import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -38,8 +43,9 @@ public class AstResolverTest {
     public static void beforeClass() throws CoreException, InvocationTargetException, ZipException, IOException {
         final String pluginPath = "test/resources/test-project.zip";
         final IJavaProject jproject = TestProjectHelper.importProject(pluginPath, PROJECT_NAME);
-        
-        final IPackageFragmentRoot sourceFolder = jproject.getPackageFragmentRoot(jproject.getResource().getProject().getFolder("src"));
+
+        final IPackageFragmentRoot sourceFolder = jproject.getPackageFragmentRoot(jproject.getResource().getProject()
+                .getFolder("src"));
         _cu = sourceFolder.getPackageFragment("test1").getCompilationUnit("A.java");
     }
 
@@ -79,5 +85,21 @@ public class AstResolverTest {
     @Test
     public void shouldReturnNullWhenNullGiven() {
         assertNull(testedClass.findParentOfType(null, BodyDeclaration.class));
+    }
+
+    @Test
+    public void shouldReturnBodyDeclarationPropertyForAbstractTypeDeclaration() {
+        final AbstractTypeDeclaration node = AST.newAST(AST.JLS4).newTypeDeclaration();
+        final ChildListPropertyDescriptor result = new AstResolver().getBodyDeclarationsProperty(node);
+
+        assertThat(result).isSameAs(node.getBodyDeclarationsProperty());
+    }
+
+    @Test
+    public void shouldReturnBodyDeclarationPropertyForAnonymousTypeDeclaration() {
+        final AnonymousClassDeclaration node = AST.newAST(AST.JLS4).newAnonymousClassDeclaration();
+        final ChildListPropertyDescriptor result = new AstResolver().getBodyDeclarationsProperty(node);
+
+        assertThat(result).isSameAs(AnonymousClassDeclaration.BODY_DECLARATIONS_PROPERTY);
     }
 }
