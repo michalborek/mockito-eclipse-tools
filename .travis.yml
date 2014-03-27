@@ -1,5 +1,5 @@
 language: java
-script: mvn clean verify
+script: mvn clean verify -Denvironment=travis
 before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"

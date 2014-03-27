@@ -76,7 +76,9 @@ public class MocksQuickAssistProcessor implements IQuickAssistProcessor {
     }
 
     public IJavaCompletionProposal getConvertToMockAssist(final IInvocationContext context) {
-        return new ConvertToFieldMockProposal(context.getCompilationUnit(), new AstResolver().findParentOfType(
+        return new ConvertToFieldMockProposal(
+                context.getCompilationUnit(), 
+                new AstResolver().findParentOfType(
                 context.getCoveringNode(), VariableDeclarationStatement.class), context.getASTRoot());
     }
 

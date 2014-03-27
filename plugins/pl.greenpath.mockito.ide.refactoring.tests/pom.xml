@@ -16,7 +16,6 @@
 			<version>3.9.1.v20130905-0837</version>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<resources>
 			<resource>
@@ -25,27 +24,40 @@
 			</resource>
 
 		</resources>
-
-		<plugins>
-			<plugin>
-				<groupId>org.eluder.coveralls</groupId>
-				<artifactId>coveralls-maven-plugin</artifactId>
-				<version>2.2.0</version>
-				<configuration>
-					<jacocoFile>${project.basedir}//target/jacoco/report/jacoco.xml</jacocoFile>
-					<sourceDirectories>
-						<sourceDirectory>${project.basedir}/../pl.greenpath.mockito.ide.refactoring/src</sourceDirectory>
-					</sourceDirectories>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>chain</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>travis</id>
+			<activation>
+				<property>
+					<name>environment</name>
+					<value>travis</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.eluder.coveralls</groupId>
+						<artifactId>coveralls-maven-plugin</artifactId>
+						<version>2.2.0</version>
+						<configuration>
+							<jacocoFile>${project.basedir}//target/jacoco/report/jacoco.xml</jacocoFile>
+							<sourceDirectories>
+								<sourceDirectory>${project.basedir}/../pl.greenpath.mockito.ide.refactoring/src</sourceDirectory>
+							</sourceDirectories>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>chain</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
