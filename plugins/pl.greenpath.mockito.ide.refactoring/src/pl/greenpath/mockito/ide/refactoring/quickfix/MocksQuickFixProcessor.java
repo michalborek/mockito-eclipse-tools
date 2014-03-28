@@ -62,8 +62,8 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
             final IProblemLocation location) {
         try {
             return Arrays.asList(
-                    getAddFieldMockitoProposal(context, location, "mock"),
-                    getAddFieldMockitoProposal(context, location, "spy"),
+                    getAddFieldMockitoProposal(context, location, "Mock"),
+                    getAddFieldMockitoProposal(context, location, "Spy"),
                     getAddLocalMockitoProposal(context, location,
                             new MockProposalStrategy(getSelectedNode(context, location))));
         } catch (final NotSupportedRefactoringException e) {

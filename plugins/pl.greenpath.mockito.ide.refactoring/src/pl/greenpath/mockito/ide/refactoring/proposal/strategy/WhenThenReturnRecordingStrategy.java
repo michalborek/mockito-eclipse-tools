@@ -19,7 +19,7 @@ public class WhenThenReturnRecordingStrategy implements ConversionToRecordingStr
 
     @Override
     public int getCursorPosition(final String addedText) {
-        return addedText.indexOf(METHOD_PREFIX) + METHOD_PREFIX.length();
+        return addedText.lastIndexOf(METHOD_PREFIX) + METHOD_PREFIX.length();
     }
 
 }

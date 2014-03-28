@@ -3,6 +3,7 @@
 	<name>pl.greenpath.mockito.ide.refactoring.tests</name>
 	<comment></comment>
 	<projects>
+		<project>pl.greenpath.mockito.ide.refactoring</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

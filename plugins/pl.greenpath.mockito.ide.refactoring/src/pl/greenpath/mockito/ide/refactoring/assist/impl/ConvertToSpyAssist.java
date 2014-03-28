@@ -20,9 +20,9 @@ import pl.greenpath.mockito.ide.refactoring.proposal.strategy.SpyProposalStrateg
 public class ConvertToSpyAssist implements IQuickFixAssist {
 
     @Override
-    public boolean isApplicable(final IInvocationContext coveringNode) {
-        if (coveringNode.getCoveringNode().getNodeType() == ASTNode.SIMPLE_NAME) {
-            final SimpleName simpleName = (SimpleName) coveringNode;
+    public boolean isApplicable(final IInvocationContext context) {
+        if (context.getCoveringNode().getNodeType() == ASTNode.SIMPLE_NAME) {
+            final SimpleName simpleName = (SimpleName) context.getCoveringNode();
             final IBinding resolveBinding = simpleName.resolveBinding();
 
             if (resolveBinding == null || resolveBinding.getKind() != IBinding.VARIABLE) {

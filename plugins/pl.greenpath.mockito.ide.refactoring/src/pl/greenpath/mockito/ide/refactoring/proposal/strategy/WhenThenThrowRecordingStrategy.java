@@ -19,7 +19,7 @@ public class WhenThenThrowRecordingStrategy implements ConversionToRecordingStra
 
     @Override
     public int getCursorPosition(final String addedText) {
-        return addedText.indexOf(METHOD_NAME_WITH_PARENTHESIS) + METHOD_NAME_WITH_PARENTHESIS.length();
+        return addedText.lastIndexOf(METHOD_NAME_WITH_PARENTHESIS) + METHOD_NAME_WITH_PARENTHESIS.length();
     }
 
 }

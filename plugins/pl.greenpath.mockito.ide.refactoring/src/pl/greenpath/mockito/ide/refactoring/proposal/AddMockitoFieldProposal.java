@@ -28,7 +28,7 @@ public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
 
     public AddMockitoFieldProposal(final ICompilationUnit cu, final SimpleName selectedNode,
             final CompilationUnit astRoot, final String mockitoAnnotation) {
-        super("Create field " + mockitoAnnotation, cu, null, 0);
+        super("Create field " + mockitoAnnotation.toLowerCase(), cu, null, 0);
         this.selectedNode = selectedNode;
         this.astRoot = astRoot;
         this.mockitoAnnotation = MOCKITO_PACKAGE + mockitoAnnotation;
