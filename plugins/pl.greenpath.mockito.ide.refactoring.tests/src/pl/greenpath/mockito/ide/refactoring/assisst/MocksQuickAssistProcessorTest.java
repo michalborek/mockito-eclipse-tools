@@ -7,10 +7,12 @@ import static org.mockito.Mockito.when;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -18,55 +20,141 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.ui.text.java.IInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IProblemLocation;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import pl.greenpath.mockito.ide.refactoring.proposal.ConvertToFieldMockProposal;
 
+@RunWith(MockitoJUnitRunner.class)
 public class MocksQuickAssistProcessorTest {
+
+    @Mock
+    private CompilationUnit astRootMock;
+
+    @Mock
+    private ICompilationUnit cuMock;
+
+    @Mock
+    private IInvocationContext contextMock;
 
     private final AST ast = AST.newAST(AST.JLS4);
 
-    @Test
-    public void test() throws CoreException {
-        final MocksQuickAssistProcessor testedClass = new MocksQuickAssistProcessor();
+    private IProblemLocation[] locations;
 
-        final IInvocationContext contextMock = mock(IInvocationContext.class);
-        final ICompilationUnit cuMock = mock(ICompilationUnit.class);
+    private MocksQuickAssistProcessor testedClass;
+
+    @Before
+    public void before() {
         when(contextMock.getCompilationUnit()).thenReturn(cuMock);
-        final CompilationUnit astMock = mock(CompilationUnit.class);
-        when(contextMock.getASTRoot()).thenReturn(astMock);
-        final ASTNode value = getMockVariableDeclaration();
-        when(contextMock.getCoveringNode()).thenReturn(value);
+        when(contextMock.getASTRoot()).thenReturn(astRootMock);
+        locations = new IProblemLocation[] { mock(IProblemLocation.class) };
+        testedClass = new MocksQuickAssistProcessor();
+    }
 
-        final IProblemLocation problem1 = mock(IProblemLocation.class);
-        final IProblemLocation[] locations = new IProblemLocation[] { problem1 };
+    @Test
+    public void shouldReturnConvertToFieldProposalForLocalMockDeclaration() throws CoreException {
+        final VariableDeclarationFragment variableDeclaration = createVariableDeclaration("Object", "type");
+        variableDeclaration.setInitializer(getMethodInvocation("mock", "Object"));
+
+        when(contextMock.getCoveringNode()).thenReturn(getVariableDeclarationStatement(variableDeclaration));
+
         final IJavaCompletionProposal[] result = testedClass.getAssists(contextMock, locations);
+
         assertThat(result).hasSize(1);
         assertThat(result[0]).isInstanceOf(ConvertToFieldMockProposal.class);
     }
 
-    @SuppressWarnings("unchecked")
-    private VariableDeclarationStatement getMockVariableDeclaration() {
-        final MethodInvocation methodInvocation = getMethodInvocation("mock");
-        final VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
-        fragment.setInitializer(methodInvocation);
-        fragment.setName(ast.newSimpleName("test"));
-        final VariableDeclarationStatement result = ast.newVariableDeclarationStatement(fragment);
+    @Test
+    public void shouldNotReturnConvertToFieldProposalWhenConflictingWithFieldName() throws CoreException {
+        final VariableDeclarationFragment variableDeclaration = createVariableDeclaration("Object", "conflicting");
+        variableDeclaration.setInitializer(getMethodInvocation("mock", "Object"));
 
+        when(contextMock.getCoveringNode()).thenReturn(getVariableDeclarationStatement(variableDeclaration));
+
+        assertThat(testedClass.getAssists(contextMock, locations)).isEmpty();
+    }
+
+    @Test
+    public void shouldNotReturnConvertToFieldProposalIsNotLocalMock() throws CoreException {
+        final VariableDeclarationFragment variableDeclaration = createVariableDeclaration("Object", "type");
+        variableDeclaration.setInitializer(getMethodInvocation("notAMock", "Object"));
+
+        when(contextMock.getCoveringNode()).thenReturn(getVariableDeclarationStatement(variableDeclaration));
+
+        final IJavaCompletionProposal[] result = testedClass.getAssists(contextMock, locations);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void shouldNotReturnConvertToFieldProposalIfNotMethodInvocationPresent() throws CoreException {
+        final VariableDeclarationFragment variableDeclaration = createVariableDeclaration("Object", "type");
+        variableDeclaration.setInitializer(ast.newStringLiteral());
+
+        when(contextMock.getCoveringNode()).thenReturn(getVariableDeclarationStatement(variableDeclaration));
+
+        final IJavaCompletionProposal[] result = testedClass.getAssists(contextMock, locations);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void shouldReturnEmptyArrayWhenCannotAnyUseConverter() throws CoreException {
+        when(contextMock.getCoveringNode()).thenReturn(ast.newSimpleName("testName"));
+
+        assertThat(testedClass.getAssists(contextMock, locations)).isEmpty();
+    }
+
+    private VariableDeclarationStatement getVariableDeclarationStatement(
+            final VariableDeclarationFragment variableDeclaration) {
+        final VariableDeclarationStatement declaration = ast.newVariableDeclarationStatement(variableDeclaration);
+        createTypeStub(declaration);
+        return declaration;
+    }
+
+    private void createTypeStub(final VariableDeclarationStatement mockDeclaration) {
+        final FieldDeclaration fieldDeclaration = ast.newFieldDeclaration(createVariableDeclaration("Object",
+                "conflicting"));
+        final MethodDeclaration methodDeclaration = createMethodDeclaration(mockDeclaration);
+        createTypeDeclaration(fieldDeclaration, methodDeclaration);
+    }
+
+    private VariableDeclarationFragment createVariableDeclaration(final String type, final String variableName) {
+        final VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
+        fragment.setName(ast.newSimpleName(variableName));
+        return fragment;
+    }
+
+    @SuppressWarnings("unchecked")
+    private TypeDeclaration createTypeDeclaration(final BodyDeclaration... bodyDeclarations) {
         final TypeDeclaration typeDeclaration = ast.newTypeDeclaration();
+
+        for (final BodyDeclaration bodyDeclaration : bodyDeclarations) {
+            typeDeclaration.bodyDeclarations().add(bodyDeclaration);
+        }
+        return typeDeclaration;
+    }
+
+    @SuppressWarnings("unchecked")
+    private MethodDeclaration createMethodDeclaration(final VariableDeclarationStatement statement) {
         final MethodDeclaration newMethodDeclaration = ast.newMethodDeclaration();
         newMethodDeclaration.setName(ast.newSimpleName("method"));
         newMethodDeclaration.setBody(ast.newBlock());
-        newMethodDeclaration.getBody().statements().add(result);
-        typeDeclaration.bodyDeclarations().add(newMethodDeclaration);
-        return result;
+        newMethodDeclaration.getBody().statements().add(statement);
+        return newMethodDeclaration;
     }
 
-    private MethodInvocation getMethodInvocation(final String invokedMethod) {
+    @SuppressWarnings("unchecked")
+    private MethodInvocation getMethodInvocation(final String methodName, final String className) {
         final MethodInvocation methodInvocation = ast.newMethodInvocation();
-        methodInvocation.setName(ast.newSimpleName(invokedMethod));
+        final SimpleType methodArgument = ast.newSimpleType(ast.newName(className));
+
+        methodInvocation.setName(ast.newSimpleName(methodName));
         final TypeLiteral typeLiteral = ast.newTypeLiteral();
-        typeLiteral.setType(ast.newSimpleType(ast.newName("Object")));
+        typeLiteral.setType(methodArgument);
         methodInvocation.arguments().add(typeLiteral);
         return methodInvocation;
     }

@@ -93,8 +93,9 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
         if (!mockMethodSecondArgument.getName().getIdentifier().equals("extraInterfaces")) {
             return false;
         }
-        
-        builder.setAnnotationWithExtraInterfaces(MOCK, (TypeLiteral[]) mockMethodSecondArgument.arguments().toArray(new TypeLiteral[0]));
+
+        builder.setAnnotationWithExtraInterfaces(MOCK,
+                (TypeLiteral[]) mockMethodSecondArgument.arguments().toArray(new TypeLiteral[0]));
         return true;
     }
 
@@ -102,4 +103,10 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
     public Image getImage() {
         return PluginImages.get(ISharedImages.IMG_FIELD_PRIVATE);
     }
+
+    @Override
+    public String toString() {
+        return "ConvertToFieldMockProposal [selectedStatement=" + selectedStatement + "]";
+    }
+
 }

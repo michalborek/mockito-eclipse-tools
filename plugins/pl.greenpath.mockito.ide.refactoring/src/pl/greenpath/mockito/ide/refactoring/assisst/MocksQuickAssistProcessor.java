@@ -83,7 +83,6 @@ public class MocksQuickAssistProcessor implements IQuickAssistProcessor {
     }
 
     public IJavaCompletionProposal getConvertToSpyAssist(final IInvocationContext context) {
-    	
     	final SimpleName coveredNode = (SimpleName) context.getCoveringNode();
 		return new AddLocalMockitoProposal(context.getCompilationUnit(), coveredNode, context.getASTRoot(), 
 				new SpyProposalStrategy(coveredNode));
