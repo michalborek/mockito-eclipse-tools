@@ -1,4 +1,4 @@
-package pl.greenpath.mockito.ide.refactoring.assist.impl;
+package pl.greenpath.mockito.ide.refactoring.quickassist.impl;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
@@ -29,7 +29,7 @@ public class TestUtils {
         createTypeDeclaration(fieldDeclaration, methodDeclaration);
     }
 
-    static VariableDeclarationFragment createVariableDeclaration(final String type, final String variableName) {
+    public static VariableDeclarationFragment createVariableDeclaration(final String type, final String variableName) {
         final VariableDeclarationFragment fragment = AST_INSTANCE.newVariableDeclarationFragment();
         fragment.setName(AST_INSTANCE.newSimpleName(variableName));
         return fragment;
@@ -55,7 +55,7 @@ public class TestUtils {
     }
 
     @SuppressWarnings("unchecked")
-    static MethodInvocation getMethodInvocation(final String methodName, final String className) {
+    public static MethodInvocation getMethodInvocation(final String methodName, final String className) {
         final MethodInvocation methodInvocation = AST_INSTANCE.newMethodInvocation();
         final SimpleType methodArgument = AST_INSTANCE.newSimpleType(AST_INSTANCE.newName(className));
 

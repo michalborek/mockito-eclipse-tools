@@ -11,7 +11,7 @@
    <extension
          point="org.eclipse.jdt.ui.quickAssistProcessors">
       <quickAssistProcessor
-            class="pl.greenpath.mockito.ide.refactoring.assist.MocksQuickAssistProcessor"
+            class="pl.greenpath.mockito.ide.refactoring.quickassist.MocksQuickAssistProcessor"
             id="pl.greenpath.mockito.ide.refactoring.quickAssistProcessor">
 		   <enablement>
            <with variable="projectNatures">

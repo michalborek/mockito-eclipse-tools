@@ -1,4 +1,4 @@
-package pl.greenpath.mockito.ide.refactoring.assist;
+package pl.greenpath.mockito.ide.refactoring.quickassist;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -18,7 +18,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import pl.greenpath.mockito.ide.refactoring.assist.impl.IQuickFixAssist;
+import pl.greenpath.mockito.ide.refactoring.quickassist.MocksQuickAssistProcessor;
+import pl.greenpath.mockito.ide.refactoring.quickassist.impl.IQuickFixAssist;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MocksQuickAssistProcessorTest extends MocksQuickAssistProcessor {

@@ -7,6 +7,7 @@ Eclipse plugin that simplifies test creation by providing refactorings for Mocki
 * Introduce a @Mock field from non-existing variable declaration
 * Introduce mock local variable from non-existing variable declaration
 * Adds @RunsWith(MockitoJunitRunner.class) when needed
+* Converts method invocation into mock recording (e.g. test.someMethod() -> when(test.someMethod()).thenReturn(<cursor_here>)). 
 
 TBD.
 

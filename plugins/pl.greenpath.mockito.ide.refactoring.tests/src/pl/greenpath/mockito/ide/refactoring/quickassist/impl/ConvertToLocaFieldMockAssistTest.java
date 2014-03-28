@@ -1,4 +1,4 @@
-package pl.greenpath.mockito.ide.refactoring.assist.impl;
+package pl.greenpath.mockito.ide.refactoring.quickassist.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import pl.greenpath.mockito.ide.refactoring.proposal.ConvertToFieldMockProposal;
+import pl.greenpath.mockito.ide.refactoring.quickassist.impl.ConvertToFieldMockAssist;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConvertToLocaFieldMockAssistTest {
