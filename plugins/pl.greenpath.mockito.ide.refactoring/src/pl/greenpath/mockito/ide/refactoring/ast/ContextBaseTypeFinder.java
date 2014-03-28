@@ -13,7 +13,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
+import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoringException;
 
 /**
  * This class is responsible for finding type of given selection (expression),
@@ -36,11 +36,11 @@ public class ContextBaseTypeFinder {
      * Finds best matching type for selectedExpression given in constructor
      * 
      * @return possible type of selectedExpression
-     * @throws NotSupportedRefactoring
+     * @throws NotSupportedRefactoringException
      *             when this finder does not support the context of expression
      *             usage.
      */
-    public ITypeBinding find(final ASTNode selectedExpression) throws NotSupportedRefactoring {
+    public ITypeBinding find(final ASTNode selectedExpression) throws NotSupportedRefactoringException {
         this.selectedExpression = selectedExpression;
         final ASTNode parent = selectedExpression.getParent();
         switch (parent.getNodeType()) {
@@ -57,7 +57,7 @@ public class ContextBaseTypeFinder {
         case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
             return getProposedType((VariableDeclarationFragment) parent);
         }
-        throw new NotSupportedRefactoring("Type of invocation not supported by this fix processor: "
+        throw new NotSupportedRefactoringException("Type of invocation not supported by this fix processor: "
                 + parent.getClass().getName());
     }
 

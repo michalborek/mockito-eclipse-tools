@@ -36,7 +36,7 @@ import org.junit.Test;
 import pl.greenpath.mockito.ide.refactoring.ASTTesting;
 import pl.greenpath.mockito.ide.refactoring.TestProjectHelper;
 import pl.greenpath.mockito.ide.refactoring.proposal.strategy.MockProposalStrategy;
-import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
+import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoringException;
 
 public class AddLocalMockProposalTest {
     
@@ -67,7 +67,7 @@ public class AddLocalMockProposalTest {
 
     @SuppressWarnings("rawtypes")
     @Test
-    public void shouldCreateMockOfSpecifiedType() throws NotSupportedRefactoring, CoreException {
+    public void shouldCreateMockOfSpecifiedType() throws NotSupportedRefactoringException, CoreException {
         final MethodDeclaration aMethod = _type.getMethods()[0];
         final ExpressionStatement invocationStatement = (ExpressionStatement) aMethod.getBody().statements().get(0);
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();

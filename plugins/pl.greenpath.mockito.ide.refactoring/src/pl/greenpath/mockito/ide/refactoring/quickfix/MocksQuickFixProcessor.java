@@ -26,7 +26,7 @@ import pl.greenpath.mockito.ide.refactoring.proposal.strategy.MockProposalStrate
 import pl.greenpath.mockito.ide.refactoring.proposal.strategy.ProposalStrategy;
 import pl.greenpath.mockito.ide.refactoring.proposal.strategy.WhenThenReturnRecordingStrategy;
 import pl.greenpath.mockito.ide.refactoring.proposal.strategy.WhenThenThrowRecordingStrategy;
-import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
+import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoringException;
 
 public class MocksQuickFixProcessor implements IQuickFixProcessor {
 
@@ -66,7 +66,7 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
                     getAddFieldMockitoProposal(context, location, "spy"),
                     getAddLocalMockitoProposal(context, location,
                             new MockProposalStrategy(getSelectedNode(context, location))));
-        } catch (final NotSupportedRefactoring e) {
+        } catch (final NotSupportedRefactoringException e) {
             // TODO logging
             e.printStackTrace();
             return Collections.emptyList();
@@ -74,24 +74,24 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
     }
 
     private IJavaCompletionProposal getAddLocalMockitoProposal(final IInvocationContext context,
-            final IProblemLocation location, final ProposalStrategy proposalStrategy) throws NotSupportedRefactoring {
+            final IProblemLocation location, final ProposalStrategy proposalStrategy) throws NotSupportedRefactoringException {
         final SimpleName selectedNode = getSelectedNode(context, location);
         return new AddLocalMockitoProposal(context.getCompilationUnit(), selectedNode, context.getASTRoot(),
                 proposalStrategy);
     }
 
     private SimpleName getSelectedNode(final IInvocationContext context,
-            final IProblemLocation location) throws NotSupportedRefactoring {
+            final IProblemLocation location) throws NotSupportedRefactoringException {
         final ASTNode selectedNode = location.getCoveredNode(context.getASTRoot());
         if (selectedNode.getNodeType() != ASTNode.SIMPLE_NAME) {
-            throw new NotSupportedRefactoring("This selection is not supported by this refactoring");
+            throw new NotSupportedRefactoringException("This selection is not supported by this refactoring");
         }
         return (SimpleName) selectedNode;
     }
 
     private AddMockitoFieldProposal getAddFieldMockitoProposal(final IInvocationContext context,
             final IProblemLocation location, final String mockitoAnnotation)
-            throws NotSupportedRefactoring {
+            throws NotSupportedRefactoringException {
         final ASTNode selectedNode = getSelectedNode(context, location);
         return new AddMockitoFieldProposal(context.getCompilationUnit(), (SimpleName) selectedNode,
                 context.getASTRoot(), mockitoAnnotation);

@@ -29,7 +29,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
 import pl.greenpath.mockito.ide.refactoring.proposal.strategy.MockProposalStrategy;
 import pl.greenpath.mockito.ide.refactoring.proposal.strategy.ProposalStrategy;
-import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
+import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoringException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ToLocalMockConverterTest {
@@ -47,7 +47,7 @@ public class ToLocalMockConverterTest {
     }
 
     @Test
-    public void shouldConvertToLocalMock() throws NotSupportedRefactoring {
+    public void shouldConvertToLocalMock() throws NotSupportedRefactoringException {
         final SimpleName selectedNode = ast.newSimpleName("testName");
         final ExpressionStatement result = checkConversion(new MockProposalStrategy(selectedNode), selectedNode);
 
@@ -60,7 +60,7 @@ public class ToLocalMockConverterTest {
 
     @SuppressWarnings("rawtypes")
     public ExpressionStatement checkConversion(final ProposalStrategy proposalStrategy, final SimpleName selectedNode)
-            throws NotSupportedRefactoring {
+            throws NotSupportedRefactoringException {
         final MethodDeclaration method = getMethodDeclaration("test", getVariableDeclaration(selectedNode));
 
         final ToLocalMockConverter testedClass = new ToLocalMockConverter(importRewrite, selectedNode,
@@ -77,7 +77,7 @@ public class ToLocalMockConverterTest {
         return mockDeclaration;
     }
 
-    private ContextBaseTypeFinder getFinderMock() throws NotSupportedRefactoring {
+    private ContextBaseTypeFinder getFinderMock() throws NotSupportedRefactoringException {
         final ContextBaseTypeFinder finderMock = mock(ContextBaseTypeFinder.class);
         final ITypeBinding typeBindingMock = mock(ITypeBinding.class);
         final ITypeBinding typeDeclarationMock = mock(ITypeBinding.class);

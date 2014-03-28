@@ -15,7 +15,7 @@ import pl.greenpath.mockito.ide.refactoring.ast.BindingFinder;
 import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
 import pl.greenpath.mockito.ide.refactoring.builder.FieldDeclarationBuilder;
 import pl.greenpath.mockito.ide.refactoring.builder.TypeSingleMemberAnnotationBuilder;
-import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoring;
+import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoringException;
 
 public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
 
@@ -40,7 +40,7 @@ public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
         createImportRewrite(astRoot);
         try {
             addMissingFieldDeclaration(rewrite);
-        } catch (final NotSupportedRefactoring e) {
+        } catch (final NotSupportedRefactoringException e) {
             // TODO logging
             e.printStackTrace();
         }
@@ -56,7 +56,7 @@ public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
                 .build();
     }
 
-    private void addMissingFieldDeclaration(final ASTRewrite rewrite) throws NotSupportedRefactoring {
+    private void addMissingFieldDeclaration(final ASTRewrite rewrite) throws NotSupportedRefactoringException {
         new FieldDeclarationBuilder(selectedNode, astRoot, rewrite, getImportRewrite())
                 .setType(new ContextBaseTypeFinder().find(selectedNode))
                 .setModifiers(ModifierKeyword.PRIVATE_KEYWORD)

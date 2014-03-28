@@ -1,7 +1,6 @@
-package pl.greenpath.mockito.ide.refactoring.assisst;
+package pl.greenpath.mockito.ide.refactoring.assist.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.core.runtime.CoreException;
@@ -18,8 +17,6 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.ui.text.java.IInvocationContext;
-import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
-import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +26,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import pl.greenpath.mockito.ide.refactoring.proposal.ConvertToFieldMockProposal;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MocksQuickAssistProcessorTest {
+public class ConvertToLocaFieldMockAssistTest {
 
     @Mock
     private CompilationUnit astRootMock;
@@ -42,70 +39,58 @@ public class MocksQuickAssistProcessorTest {
 
     private final AST ast = AST.newAST(AST.JLS4);
 
-    private IProblemLocation[] locations;
-
-    private MocksQuickAssistProcessor testedClass;
+    private ConvertToFieldMockAssist testedClass;
 
     @Before
     public void before() {
         when(contextMock.getCompilationUnit()).thenReturn(cuMock);
         when(contextMock.getASTRoot()).thenReturn(astRootMock);
-        locations = new IProblemLocation[] { mock(IProblemLocation.class) };
-        testedClass = new MocksQuickAssistProcessor();
+        testedClass = new ConvertToFieldMockAssist();
     }
 
     @Test
-    public void shouldReturnConvertToFieldProposalForLocalMockDeclaration() throws CoreException {
+    public void shouldBeApplicable_forLocalMockDeclaration() throws CoreException {
         final VariableDeclarationFragment variableDeclaration = createVariableDeclaration("Object", "type");
         variableDeclaration.setInitializer(getMethodInvocation("mock", "Object"));
 
         when(contextMock.getCoveringNode()).thenReturn(getVariableDeclarationStatement(variableDeclaration));
 
-        final IJavaCompletionProposal[] result = testedClass.getAssists(contextMock, locations);
-
-        assertThat(result).hasSize(1);
-        assertThat(result[0]).isInstanceOf(ConvertToFieldMockProposal.class);
+        assertThat(testedClass.isApplicable(contextMock)).isTrue();
     }
 
     @Test
-    public void shouldNotReturnConvertToFieldProposalWhenConflictingWithFieldName() throws CoreException {
+    public void shouldNotBeApplicable_fieldNameConflictsWithExistingOne() throws CoreException {
         final VariableDeclarationFragment variableDeclaration = createVariableDeclaration("Object", "conflicting");
         variableDeclaration.setInitializer(getMethodInvocation("mock", "Object"));
 
         when(contextMock.getCoveringNode()).thenReturn(getVariableDeclarationStatement(variableDeclaration));
 
-        assertThat(testedClass.getAssists(contextMock, locations)).isEmpty();
+        assertThat(testedClass.isApplicable(contextMock)).isFalse();
     }
 
     @Test
-    public void shouldNotReturnConvertToFieldProposalIsNotLocalMock() throws CoreException {
+    public void shouldNotBeApplicable_ConvertToFieldProposalIsNotLocalMock() throws CoreException {
         final VariableDeclarationFragment variableDeclaration = createVariableDeclaration("Object", "type");
         variableDeclaration.setInitializer(getMethodInvocation("notAMock", "Object"));
 
         when(contextMock.getCoveringNode()).thenReturn(getVariableDeclarationStatement(variableDeclaration));
 
-        final IJavaCompletionProposal[] result = testedClass.getAssists(contextMock, locations);
-
-        assertThat(result).isEmpty();
+        assertThat(testedClass.isApplicable(contextMock)).isFalse();
     }
 
     @Test
-    public void shouldNotReturnConvertToFieldProposalIfNotMethodInvocationPresent() throws CoreException {
+    public void shouldNotBeApplicable_convertToFieldProposalIfNotMethodInvocationPresent() throws CoreException {
         final VariableDeclarationFragment variableDeclaration = createVariableDeclaration("Object", "type");
         variableDeclaration.setInitializer(ast.newStringLiteral());
 
         when(contextMock.getCoveringNode()).thenReturn(getVariableDeclarationStatement(variableDeclaration));
 
-        final IJavaCompletionProposal[] result = testedClass.getAssists(contextMock, locations);
-
-        assertThat(result).isEmpty();
+        assertThat(testedClass.isApplicable(contextMock)).isFalse();
     }
 
     @Test
-    public void shouldReturnEmptyArrayWhenCannotAnyUseConverter() throws CoreException {
-        when(contextMock.getCoveringNode()).thenReturn(ast.newSimpleName("testName"));
-
-        assertThat(testedClass.getAssists(contextMock, locations)).isEmpty();
+    public void shouldReturnProposal() {
+        assertThat(testedClass.getProposal(contextMock)).isInstanceOf(ConvertToFieldMockProposal.class);
     }
 
     private VariableDeclarationStatement getVariableDeclarationStatement(
