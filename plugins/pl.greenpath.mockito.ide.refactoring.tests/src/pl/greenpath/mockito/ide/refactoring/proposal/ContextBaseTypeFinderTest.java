@@ -32,7 +32,6 @@ import org.junit.Test;
 import pl.greenpath.mockito.ide.refactoring.ASTTesting;
 import pl.greenpath.mockito.ide.refactoring.TestProjectHelper;
 import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
-import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoringException;
 
 public class ContextBaseTypeFinderTest {
 
@@ -62,7 +61,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfMethodInvocationParameter() throws CoreException, NotSupportedRefactoringException {
+    public void shouldFindTypeOfMethodInvocationParameter() throws CoreException {
         final MethodDeclaration aMethod = _type.getMethods()[0];
         final ExpressionStatement invocationStatement = (ExpressionStatement) aMethod.getBody().statements().get(0);
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
@@ -74,7 +73,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfArrayInitializerParameter() throws CoreException, NotSupportedRefactoringException {
+    public void shouldFindTypeOfArrayInitializerParameter() throws CoreException {
         final MethodDeclaration cMethod = _type.getMethods()[2];
         final VariableDeclarationStatement methodInvocationStatement = (VariableDeclarationStatement) cMethod.getBody()
                 .statements().get(0);
@@ -90,7 +89,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfConstructorInvocationParameter() throws CoreException, NotSupportedRefactoringException {
+    public void shouldFindTypeOfConstructorInvocationParameter() throws CoreException {
         final MethodDeclaration dMethod = _type.getMethods()[3];
         final VariableDeclarationStatement invocationStatement = (VariableDeclarationStatement) dMethod.getBody()
                 .statements().get(0);
@@ -106,7 +105,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfAssignment() throws CoreException, NotSupportedRefactoringException {
+    public void shouldFindTypeOfAssignment() throws CoreException {
         final MethodDeclaration eMethod = _type.getMethods()[4];
         final ExpressionStatement expression = (ExpressionStatement) eMethod.getBody().statements().get(1);
         final Assignment assignment = (Assignment) expression.getExpression();
@@ -118,7 +117,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfReturnStatement() throws CoreException, NotSupportedRefactoringException {
+    public void shouldFindTypeOfReturnStatement() throws CoreException {
         final MethodDeclaration fMethod = _type.getMethods()[5];
         final ReturnStatement expression = (ReturnStatement) fMethod.getBody().statements().get(0);
         final SimpleName testMockName = (SimpleName) expression.getExpression();
@@ -129,7 +128,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfVariableDeclaration() throws CoreException, NotSupportedRefactoringException {
+    public void shouldFindTypeOfVariableDeclaration() throws CoreException {
         final MethodDeclaration gMethod = _type.getMethods()[6];
         final VariableDeclarationStatement methodInvocationStatement = (VariableDeclarationStatement) gMethod.getBody()
                 .statements().get(0);

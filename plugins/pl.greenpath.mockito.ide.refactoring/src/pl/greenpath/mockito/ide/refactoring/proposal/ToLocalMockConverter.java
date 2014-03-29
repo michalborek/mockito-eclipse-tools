@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
 import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
 import pl.greenpath.mockito.ide.refactoring.proposal.strategy.ProposalStrategy;
-import pl.greenpath.mockito.ide.refactoring.quickfix.exception.NotSupportedRefactoringException;
 
 public class ToLocalMockConverter extends ImportsModifier {
 
@@ -46,7 +45,7 @@ public class ToLocalMockConverter extends ImportsModifier {
         this.methodBody = new AstResolver().findParentOfType(selectedNode, MethodDeclaration.class);
     }
 
-    public ASTRewrite performFix() throws NotSupportedRefactoringException {
+    public ASTRewrite performFix() {
         final ExpressionStatement initLocalMockExpression = createMockMethodInvocation(contextBaseTypeFinder
                 .find(selectedNode));
         final ASTRewrite rewrite = ASTRewrite.create(selectedNode.getAST());
