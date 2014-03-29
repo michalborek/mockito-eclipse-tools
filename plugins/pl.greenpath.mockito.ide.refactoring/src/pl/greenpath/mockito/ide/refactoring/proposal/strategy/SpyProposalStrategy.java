@@ -30,4 +30,10 @@ public class SpyProposalStrategy implements ProposalStrategy {
     public String getMockitoMethodName() {
         return SPY_NAME.toLowerCase();
     }
+
+    @Override
+    public String toString() {
+        return "SpyProposalStrategy [_selectedNode=" + _selectedNode + "]";
+    }
+
 }

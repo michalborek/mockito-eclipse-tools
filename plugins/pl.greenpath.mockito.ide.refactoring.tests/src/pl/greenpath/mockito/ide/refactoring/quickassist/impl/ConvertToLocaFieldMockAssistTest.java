@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import pl.greenpath.mockito.ide.refactoring.TestUtils;
 import pl.greenpath.mockito.ide.refactoring.proposal.ConvertToFieldMockProposal;
 import pl.greenpath.mockito.ide.refactoring.quickassist.impl.ConvertToFieldMockAssist;
 
@@ -45,9 +46,9 @@ public class ConvertToLocaFieldMockAssistTest {
     @Test
     public void shouldBeApplicable_forLocalMockDeclaration() throws CoreException {
         final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("Object", "type");
-        variableDeclaration.setInitializer(TestUtils.getMethodInvocation("mock", "Object"));
+        variableDeclaration.setInitializer(TestUtils.createMethodInvocation("mock", "Object"));
 
-        when(contextMock.getCoveringNode()).thenReturn(TestUtils.getVariableDeclarationStatement(variableDeclaration));
+        when(contextMock.getCoveringNode()).thenReturn(TestUtils.createVariableDeclarationStatement(variableDeclaration));
 
         assertThat(testedClass.isApplicable(contextMock)).isTrue();
     }
@@ -56,9 +57,9 @@ public class ConvertToLocaFieldMockAssistTest {
     public void shouldNotBeApplicable_fieldNameConflictsWithExistingOne() throws CoreException {
         final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("Object",
                 "conflicting");
-        variableDeclaration.setInitializer(TestUtils.getMethodInvocation("mock", "Object"));
+        variableDeclaration.setInitializer(TestUtils.createMethodInvocation("mock", "Object"));
 
-        when(contextMock.getCoveringNode()).thenReturn(TestUtils.getVariableDeclarationStatement(variableDeclaration));
+        when(contextMock.getCoveringNode()).thenReturn(TestUtils.createVariableDeclarationStatement(variableDeclaration));
 
         assertThat(testedClass.isApplicable(contextMock)).isFalse();
     }
@@ -66,9 +67,9 @@ public class ConvertToLocaFieldMockAssistTest {
     @Test
     public void shouldNotBeApplicable_convertToFieldProposalIsNotLocalMock() throws CoreException {
         final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("Object", "type");
-        variableDeclaration.setInitializer(TestUtils.getMethodInvocation("notAMock", "Object"));
+        variableDeclaration.setInitializer(TestUtils.createMethodInvocation("notAMock", "Object"));
 
-        when(contextMock.getCoveringNode()).thenReturn(TestUtils.getVariableDeclarationStatement(variableDeclaration));
+        when(contextMock.getCoveringNode()).thenReturn(TestUtils.createVariableDeclarationStatement(variableDeclaration));
 
         assertThat(testedClass.isApplicable(contextMock)).isFalse();
     }
@@ -80,7 +81,7 @@ public class ConvertToLocaFieldMockAssistTest {
         newClassInstanceCreation.setType(ast.newSimpleType(ast.newSimpleName("Object")));
         variableDeclaration.setInitializer(newClassInstanceCreation);
 
-        when(contextMock.getCoveringNode()).thenReturn(TestUtils.getVariableDeclarationStatement(variableDeclaration));
+        when(contextMock.getCoveringNode()).thenReturn(TestUtils.createVariableDeclarationStatement(variableDeclaration));
 
         assertThat(testedClass.isApplicable(contextMock)).isFalse();
     }

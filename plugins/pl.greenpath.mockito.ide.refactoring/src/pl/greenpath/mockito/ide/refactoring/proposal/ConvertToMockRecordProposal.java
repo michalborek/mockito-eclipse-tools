@@ -19,21 +19,21 @@ import pl.greenpath.mockito.ide.refactoring.proposal.strategy.ConversionToRecord
 
 public class ConvertToMockRecordProposal extends ASTRewriteCorrectionProposal {
 
-    private final ConversionToRecordingStrategy _strategy;
-    private final ASTNode _selectedNode;
-    private final CompilationUnit _astRoot;
+    private final ConversionToRecordingStrategy strategy;
+    private final ASTNode selectedNode;
+    private final CompilationUnit astRoot;
 
     public ConvertToMockRecordProposal(final ICompilationUnit cu, final ASTNode selectedNode,
             final CompilationUnit astRoot, final ConversionToRecordingStrategy strategy) {
         super(strategy.getDescription(), cu, null, 0);
-        _selectedNode = selectedNode;
-        _astRoot = astRoot;
-        _strategy = strategy;
+        this.selectedNode = selectedNode;
+        this.astRoot = astRoot;
+        this.strategy = strategy;
     }
 
     @Override
     public ASTRewrite getRewrite() throws CoreException {
-        return new ToRecordingConverter(createImportRewrite(_astRoot), _selectedNode, _strategy)
+        return new ToRecordingConverter(createImportRewrite(astRoot), selectedNode, strategy)
                 .performConversion();
     }
 
@@ -65,7 +65,7 @@ public class ConvertToMockRecordProposal extends ASTRewriteCorrectionProposal {
 
     private TextSelection getAfterFixSelection(final TextSelection initialSelection) {
         return new TextSelection(initialSelection.getOffset()
-                + _strategy.getCursorPosition(initialSelection.getText()), 0);
+                + strategy.getCursorPosition(initialSelection.getText()), 0);
     }
 
 }

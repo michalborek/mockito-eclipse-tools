@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import pl.greenpath.mockito.ide.refactoring.quickassist.impl.TestUtils;
+import pl.greenpath.mockito.ide.refactoring.TestUtils;
 import pl.greenpath.mockito.ide.refactoring.quickfix.impl.IQuickFix;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -53,25 +53,24 @@ public class MocksQuickFixProcessorTest {
 
     @Test
     public void shouldCollectFixesIfIsApplicableReturnsTrue() throws CoreException {
-        final IProblemLocation location1 = mock(IProblemLocation.class);
-        final IProblemLocation[] locations = new IProblemLocation[] { location1 };
-        when(fixMock1.isApplicable(contextMock, location1)).thenReturn(Boolean.TRUE);
-        when(fixMock2.isApplicable(contextMock, location1)).thenReturn(Boolean.FALSE);
+        final IProblemLocation location = mock(IProblemLocation.class);
+        final IProblemLocation[] locations = new IProblemLocation[] { location };
+        when(fixMock1.isApplicable(contextMock, location)).thenReturn(Boolean.TRUE);
+        when(fixMock2.isApplicable(contextMock, location)).thenReturn(Boolean.FALSE);
         final IJavaCompletionProposal proposal1 = mock(IJavaCompletionProposal.class);
-        final IJavaCompletionProposal proposal2 = mock(IJavaCompletionProposal.class);
-        when(fixMock1.getProposals(contextMock, location1)).thenReturn(Arrays.asList(proposal1, proposal2));
+        when(fixMock1.getProposal(contextMock, location)).thenReturn(proposal1);
 
         final IJavaCompletionProposal[] corrections = testedClass.getCorrections(contextMock, locations);
 
-        assertThat(corrections).containsOnly(proposal1, proposal2);
+        assertThat(corrections).containsOnly(proposal1);
     }
 
     @Test
     public void shouldReturnEmptyArrayWhenNoFixesAreApplicable() throws CoreException {
-        final IProblemLocation location1 = mock(IProblemLocation.class);
-        final IProblemLocation[] locations = new IProblemLocation[] { location1 };
-        when(fixMock1.isApplicable(contextMock, location1)).thenReturn(Boolean.FALSE);
-        when(fixMock2.isApplicable(contextMock, location1)).thenReturn(Boolean.FALSE);
+        final IProblemLocation location = mock(IProblemLocation.class);
+        final IProblemLocation[] locations = new IProblemLocation[] { location };
+        when(fixMock1.isApplicable(contextMock, location)).thenReturn(Boolean.FALSE);
+        when(fixMock2.isApplicable(contextMock, location)).thenReturn(Boolean.FALSE);
 
         final IJavaCompletionProposal[] corrections = testedClass.getCorrections(contextMock, locations);
 
@@ -80,20 +79,19 @@ public class MocksQuickFixProcessorTest {
 
     @Test
     public void shouldCollectResultsWhenMoreThanOneIsApplicable() throws CoreException {
-        final IProblemLocation location1 = mock(IProblemLocation.class);
-        final IProblemLocation[] locations = new IProblemLocation[] { location1 };
-        when(fixMock1.isApplicable(contextMock, location1)).thenReturn(Boolean.TRUE);
-        when(fixMock2.isApplicable(contextMock, location1)).thenReturn(Boolean.TRUE);
+        final IProblemLocation location = mock(IProblemLocation.class);
+        final IProblemLocation[] locations = new IProblemLocation[] { location };
+        when(fixMock1.isApplicable(contextMock, location)).thenReturn(Boolean.TRUE);
+        when(fixMock2.isApplicable(contextMock, location)).thenReturn(Boolean.TRUE);
 
         final IJavaCompletionProposal proposal1 = mock(IJavaCompletionProposal.class);
         final IJavaCompletionProposal proposal2 = mock(IJavaCompletionProposal.class);
-        final IJavaCompletionProposal proposal3 = mock(IJavaCompletionProposal.class);
-        when(fixMock1.getProposals(contextMock, location1)).thenReturn(Arrays.asList(proposal1, proposal2));
-        when(fixMock2.getProposals(contextMock, location1)).thenReturn(Arrays.asList(proposal3));
+        when(fixMock1.getProposal(contextMock, location)).thenReturn(proposal1);
+        when(fixMock2.getProposal(contextMock, location)).thenReturn(proposal2);
 
         final IJavaCompletionProposal[] corrections = testedClass.getCorrections(contextMock, locations);
 
-        assertThat(corrections).containsOnly(proposal1, proposal2, proposal3);
+        assertThat(corrections).containsOnly(proposal1, proposal2);
     }
 
     @Test
@@ -118,7 +116,7 @@ public class MocksQuickFixProcessorTest {
     public void shouldReturnConvertToMockIfApplicable() throws CoreException {
         final MocksQuickFixProcessor processor = new MocksQuickFixProcessor();
         final VariableDeclarationFragment fragment = TestUtils.createVariableDeclaration("Object", "someObject");
-        TestUtils.getVariableDeclarationStatement(fragment);
+        TestUtils.createVariableDeclarationStatement(fragment);
         final IProblemLocation location = mock(IProblemLocation.class);
         when(location.getProblemId()).thenReturn(IProblem.UnresolvedVariable);
         when(location.getCoveredNode(astRoot)).thenReturn(fragment.getName());

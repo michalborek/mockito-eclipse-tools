@@ -16,7 +16,7 @@ import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
 import pl.greenpath.mockito.ide.refactoring.builder.FieldDeclarationBuilder;
 import pl.greenpath.mockito.ide.refactoring.builder.TypeSingleMemberAnnotationBuilder;
 
-public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
+public class AddFieldMockProposal extends ASTRewriteCorrectionProposal {
 
     private static final String MOCKITO_JUNIT_RUNNER = "org.mockito.runners.MockitoJUnitRunner";
     private static final String MOCKITO_PACKAGE = "org.mockito.";
@@ -25,7 +25,7 @@ public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
     private final CompilationUnit astRoot;
     private final String mockitoAnnotation;
 
-    public AddMockitoFieldProposal(final ICompilationUnit cu, final SimpleName selectedNode,
+    public AddFieldMockProposal(final ICompilationUnit cu, final SimpleName selectedNode,
             final CompilationUnit astRoot, final String mockitoAnnotation) {
         super("Create field " + mockitoAnnotation.toLowerCase(), cu, null, 0);
         this.selectedNode = selectedNode;
@@ -69,6 +69,12 @@ public class AddMockitoFieldProposal extends ASTRewriteCorrectionProposal {
     @Override
     public Image getImage() {
         return PluginImages.get(ISharedImages.IMG_FIELD_PRIVATE);
+    }
+
+    @Override
+    public String toString() {
+        return "AddFieldMockProposal [selectedNode=" + selectedNode + ", mockitoAnnotation=" + mockitoAnnotation
+                + "]";
     }
 
 }

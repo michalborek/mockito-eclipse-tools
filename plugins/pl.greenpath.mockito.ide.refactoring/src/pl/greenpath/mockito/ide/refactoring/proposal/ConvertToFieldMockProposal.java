@@ -106,7 +106,7 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
 
     @Override
     public String toString() {
-        return "ConvertToFieldMockProposal [selectedStatement=" + selectedStatement + "]";
+        return "ConvertToFieldMockProposal [selectedStatement=\"" + selectedStatement + "\"]";
     }
 
 }

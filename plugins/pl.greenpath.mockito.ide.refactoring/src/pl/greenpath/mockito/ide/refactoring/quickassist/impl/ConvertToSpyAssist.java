@@ -14,7 +14,7 @@ import org.eclipse.jdt.ui.text.java.IInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
-import pl.greenpath.mockito.ide.refactoring.proposal.AddLocalMockitoProposal;
+import pl.greenpath.mockito.ide.refactoring.proposal.AddLocalMockProposal;
 import pl.greenpath.mockito.ide.refactoring.proposal.strategy.SpyProposalStrategy;
 
 public class ConvertToSpyAssist implements IQuickFixAssist {
@@ -72,7 +72,7 @@ public class ConvertToSpyAssist implements IQuickFixAssist {
     @Override
     public IJavaCompletionProposal getProposal(final IInvocationContext context) {
         final SimpleName coveredNode = (SimpleName) context.getCoveringNode();
-        return new AddLocalMockitoProposal(context.getCompilationUnit(), coveredNode, context.getASTRoot(),
+        return new AddLocalMockProposal(context.getCompilationUnit(), coveredNode, context.getASTRoot(),
                 new SpyProposalStrategy(coveredNode));
 
     }

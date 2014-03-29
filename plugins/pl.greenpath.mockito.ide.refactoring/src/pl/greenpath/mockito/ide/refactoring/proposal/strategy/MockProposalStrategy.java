@@ -39,4 +39,10 @@ public class MockProposalStrategy implements ProposalStrategy {
     public String getVariableIdentifier() {
         return this.selectedNode.getIdentifier();
     }
+
+    @Override
+    public String toString() {
+        return "MockProposalStrategy [selectedNode=" + selectedNode + "]";
+    }
+
 }

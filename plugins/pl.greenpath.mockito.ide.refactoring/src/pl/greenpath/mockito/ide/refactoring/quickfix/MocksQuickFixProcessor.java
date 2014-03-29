@@ -11,8 +11,11 @@ import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IQuickFixProcessor;
 
-import pl.greenpath.mockito.ide.refactoring.quickfix.impl.ConvertToMockFix;
-import pl.greenpath.mockito.ide.refactoring.quickfix.impl.ConvertToRecordingFix;
+import pl.greenpath.mockito.ide.refactoring.quickfix.impl.ConvertToFieldMockFix;
+import pl.greenpath.mockito.ide.refactoring.quickfix.impl.ConvertToFieldSpyFix;
+import pl.greenpath.mockito.ide.refactoring.quickfix.impl.ConvertToLocalMockFix;
+import pl.greenpath.mockito.ide.refactoring.quickfix.impl.ConvertToWhenThenReturnRecordingFix;
+import pl.greenpath.mockito.ide.refactoring.quickfix.impl.ConvertToWhenThenThrowRecordingFix;
 import pl.greenpath.mockito.ide.refactoring.quickfix.impl.IQuickFix;
 
 public class MocksQuickFixProcessor implements IQuickFixProcessor {
@@ -20,7 +23,12 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
     private final List<IQuickFix> quickFixes;
 
     public MocksQuickFixProcessor() {
-        this(Arrays.asList(new ConvertToMockFix(), new ConvertToRecordingFix()));
+        this(Arrays.<IQuickFix> asList(new ConvertToLocalMockFix(),
+                new ConvertToFieldMockFix(),
+                new ConvertToFieldSpyFix(),
+                new ConvertToWhenThenReturnRecordingFix(),
+                new ConvertToWhenThenThrowRecordingFix()
+                ));
     }
 
     public MocksQuickFixProcessor(final List<IQuickFix> supportedFixes) {
@@ -35,7 +43,7 @@ public class MocksQuickFixProcessor implements IQuickFixProcessor {
         for (final IProblemLocation location : locations) {
             for (final IQuickFix fix : quickFixes) {
                 if (fix.isApplicable(context, location)) {
-                    corrections.addAll(fix.getProposals(context, location));
+                    corrections.add(fix.getProposal(context, location));
                 }
             }
         }

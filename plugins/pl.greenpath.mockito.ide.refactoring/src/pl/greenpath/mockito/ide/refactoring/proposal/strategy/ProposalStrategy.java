@@ -10,5 +10,7 @@ public interface ProposalStrategy {
     String getMockitoMethodName();
 
     String getVariableIdentifier();
+    
+    
 
 }
