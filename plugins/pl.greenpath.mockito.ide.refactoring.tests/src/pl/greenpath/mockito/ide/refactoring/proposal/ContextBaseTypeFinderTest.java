@@ -61,7 +61,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfMethodInvocationParameter() throws CoreException {
+    public void shouldFindTypeOfMethodInvocationParameter() {
         final MethodDeclaration aMethod = _type.getMethods()[0];
         final ExpressionStatement invocationStatement = (ExpressionStatement) aMethod.getBody().statements().get(0);
         final MethodInvocation bMethodInvocation = (MethodInvocation) invocationStatement.getExpression();
@@ -73,7 +73,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfArrayInitializerParameter() throws CoreException {
+    public void shouldFindTypeOfArrayInitializerParameter() {
         final MethodDeclaration cMethod = _type.getMethods()[2];
         final VariableDeclarationStatement methodInvocationStatement = (VariableDeclarationStatement) cMethod.getBody()
                 .statements().get(0);
@@ -89,7 +89,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfConstructorInvocationParameter() throws CoreException {
+    public void shouldFindTypeOfConstructorInvocationParameter() {
         final MethodDeclaration dMethod = _type.getMethods()[3];
         final VariableDeclarationStatement invocationStatement = (VariableDeclarationStatement) dMethod.getBody()
                 .statements().get(0);
@@ -105,7 +105,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfAssignment() throws CoreException {
+    public void shouldFindTypeOfAssignment() {
         final MethodDeclaration eMethod = _type.getMethods()[4];
         final ExpressionStatement expression = (ExpressionStatement) eMethod.getBody().statements().get(1);
         final Assignment assignment = (Assignment) expression.getExpression();
@@ -117,7 +117,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfReturnStatement() throws CoreException {
+    public void shouldFindTypeOfReturnStatement() {
         final MethodDeclaration fMethod = _type.getMethods()[5];
         final ReturnStatement expression = (ReturnStatement) fMethod.getBody().statements().get(0);
         final SimpleName testMockName = (SimpleName) expression.getExpression();
@@ -128,7 +128,7 @@ public class ContextBaseTypeFinderTest {
     }
 
     @Test
-    public void shouldFindTypeOfVariableDeclaration() throws CoreException {
+    public void shouldFindTypeOfVariableDeclaration() {
         final MethodDeclaration gMethod = _type.getMethods()[6];
         final VariableDeclarationStatement methodInvocationStatement = (VariableDeclarationStatement) gMethod.getBody()
                 .statements().get(0);

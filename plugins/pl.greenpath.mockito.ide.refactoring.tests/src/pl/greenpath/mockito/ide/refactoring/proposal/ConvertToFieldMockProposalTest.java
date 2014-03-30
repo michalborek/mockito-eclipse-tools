@@ -24,7 +24,7 @@ public class ConvertToFieldMockProposalTest {
     @Test
     public void shouldOverrideToString() {
         final VariableDeclarationStatement selectedNode = 
-                TestUtils.createVariableDeclarationStatement(TestUtils.createVariableDeclaration("Object", "test"));
+                TestUtils.putVariableIntoStubStatement(TestUtils.createVariableDeclaration("test"));
         final ConvertToFieldMockProposal testedClass = new ConvertToFieldMockProposal(cu, selectedNode , astRoot);
         assertThat(testedClass.toString()).isEqualTo("ConvertToFieldMockProposal [selectedStatement=\"Object test;\n\"]");
     }

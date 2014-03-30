@@ -6,7 +6,6 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MemberValuePair;
@@ -14,6 +13,7 @@ import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
@@ -21,7 +21,6 @@ import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
-import pl.greenpath.mockito.ide.refactoring.ast.BindingFinder;
 
 public class FieldDeclarationBuilder {
 
@@ -31,25 +30,20 @@ public class FieldDeclarationBuilder {
     private final ImportRewrite importRewrite;
     private final SimpleName selectedNode;
     private final AstResolver astResolver;
-    private final BindingFinder bindingFinder;
-    private final CompilationUnit parentClass;
     private Annotation annotation;
 
-    public FieldDeclarationBuilder(final SimpleName variableName, final CompilationUnit parentClass,
-            final ASTRewrite rewrite,
+    public FieldDeclarationBuilder(final SimpleName variableName, final ASTRewrite rewrite,
             final ImportRewrite importRewrite) {
-        this.parentClass = parentClass;
-        ast = variableName.getAST();
+        this.ast = variableName.getAST();
         this.selectedNode = variableName;
         this.rewrite = rewrite;
         this.importRewrite = importRewrite;
-        astResolver = new AstResolver();
-        bindingFinder = new BindingFinder();
-        fieldDeclaration = createFieldDeclaration();
+        this.astResolver = new AstResolver();
+        this.fieldDeclaration = createFieldDeclaration();
     }
 
     public void build() {
-        final ASTNode declaringNode = parentClass.findDeclaringNode(bindingFinder.getParentTypeBinding(selectedNode));
+        final ASTNode declaringNode = new AstResolver().findParentOfType(selectedNode, TypeDeclaration.class);
         insertField(rewrite.getListRewrite(declaringNode, astResolver.getBodyDeclarationsProperty(declaringNode)));
         rewrite.getListRewrite(fieldDeclaration, FieldDeclaration.MODIFIERS2_PROPERTY).insertFirst(annotation, null);
     }

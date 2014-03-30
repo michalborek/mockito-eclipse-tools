@@ -59,7 +59,7 @@ public class TestProjectHelper {
         }
     }
 
-    public static File getFile(final IPath path) throws CoreException {
+    public static File getFile(final IPath path) {
         return path.toFile().getAbsoluteFile();
     }
 

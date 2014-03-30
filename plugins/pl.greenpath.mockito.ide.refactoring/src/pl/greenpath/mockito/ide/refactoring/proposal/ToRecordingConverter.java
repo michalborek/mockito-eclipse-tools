@@ -1,6 +1,5 @@
 package pl.greenpath.mockito.ide.refactoring.proposal;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
@@ -22,21 +21,22 @@ public class ToRecordingConverter extends ImportsModifier {
     private final ConversionToRecordingStrategy strategy;
     private final ASTNode selectedNode;
 
-    public ToRecordingConverter(final ImportRewrite importRewrite, final ASTNode selectedNode, final ConversionToRecordingStrategy strategy) {
+    public ToRecordingConverter(final ImportRewrite importRewrite, final ASTNode selectedNode,
+            final ConversionToRecordingStrategy strategy) {
         super(importRewrite, selectedNode.getAST());
         this.selectedNode = selectedNode;
         this.strategy = strategy;
     }
 
-    public ASTRewrite performConversion() throws CoreException {
-        final ASTNode newStatement = setMockMethodInvocation((Expression) selectedNode, null);
+    public ASTRewrite performConversion() {
+        final ASTNode newStatement = setMockMethodInvocation((Expression) selectedNode);
         final ASTRewrite rewrite = ASTRewrite.create(ast);
         rewrite.getListRewrite(getMethodBodyBlockContainingNode(), Block.STATEMENTS_PROPERTY).replace(
                 getCurrentStatement(), newStatement, null);
         return rewrite;
     }
 
-    private ExpressionStatement setMockMethodInvocation(final Expression expression, final Expression returnValue) {
+    private ExpressionStatement setMockMethodInvocation(final Expression expression) {
         importStaticMethod(MOCKITO_PACKAGE, MOCK_METHOD_NAME);
         final Expression initLocalMockExpression = (Expression) ASTNode.copySubtree(ast, expression);
 

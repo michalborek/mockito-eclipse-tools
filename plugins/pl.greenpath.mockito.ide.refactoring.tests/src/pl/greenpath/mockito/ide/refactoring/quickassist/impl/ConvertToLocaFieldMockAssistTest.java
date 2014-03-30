@@ -3,7 +3,6 @@ package pl.greenpath.mockito.ide.refactoring.quickassist.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -18,7 +17,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import pl.greenpath.mockito.ide.refactoring.TestUtils;
 import pl.greenpath.mockito.ide.refactoring.proposal.ConvertToFieldMockProposal;
-import pl.greenpath.mockito.ide.refactoring.quickassist.impl.ConvertToFieldMockAssist;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConvertToLocaFieldMockAssistTest {
@@ -44,44 +42,47 @@ public class ConvertToLocaFieldMockAssistTest {
     }
 
     @Test
-    public void shouldBeApplicable_forLocalMockDeclaration() throws CoreException {
-        final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("Object", "type");
+    public void shouldBeApplicable_forLocalMockDeclaration() {
+        final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("type");
         variableDeclaration.setInitializer(TestUtils.createMethodInvocation("mock", "Object"));
 
-        when(contextMock.getCoveringNode()).thenReturn(TestUtils.createVariableDeclarationStatement(variableDeclaration));
+        when(contextMock.getCoveringNode()).thenReturn(
+                TestUtils.putVariableIntoStubStatement(variableDeclaration));
 
         assertThat(testedClass.isApplicable(contextMock)).isTrue();
     }
 
     @Test
-    public void shouldNotBeApplicable_fieldNameConflictsWithExistingOne() throws CoreException {
-        final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("Object",
-                "conflicting");
+    public void shouldNotBeApplicable_fieldNameConflictsWithExistingOne() {
+        final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("conflicting");
         variableDeclaration.setInitializer(TestUtils.createMethodInvocation("mock", "Object"));
 
-        when(contextMock.getCoveringNode()).thenReturn(TestUtils.createVariableDeclarationStatement(variableDeclaration));
+        when(contextMock.getCoveringNode()).thenReturn(
+                TestUtils.putVariableIntoStubStatement(variableDeclaration));
 
         assertThat(testedClass.isApplicable(contextMock)).isFalse();
     }
 
     @Test
-    public void shouldNotBeApplicable_convertToFieldProposalIsNotLocalMock() throws CoreException {
-        final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("Object", "type");
+    public void shouldNotBeApplicable_convertToFieldProposalIsNotLocalMock() {
+        final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("type");
         variableDeclaration.setInitializer(TestUtils.createMethodInvocation("notAMock", "Object"));
 
-        when(contextMock.getCoveringNode()).thenReturn(TestUtils.createVariableDeclarationStatement(variableDeclaration));
+        when(contextMock.getCoveringNode()).thenReturn(
+                TestUtils.putVariableIntoStubStatement(variableDeclaration));
 
         assertThat(testedClass.isApplicable(contextMock)).isFalse();
     }
 
     @Test
-    public void shouldNotBeApplicable_convertToFieldProposalIfNotMethodInvocationPresent() throws CoreException {
-        final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("Object", "type");
+    public void shouldNotBeApplicable_convertToFieldProposalIfNotMethodInvocationPresent() {
+        final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("type");
         final ClassInstanceCreation newClassInstanceCreation = ast.newClassInstanceCreation();
         newClassInstanceCreation.setType(ast.newSimpleType(ast.newSimpleName("Object")));
         variableDeclaration.setInitializer(newClassInstanceCreation);
 
-        when(contextMock.getCoveringNode()).thenReturn(TestUtils.createVariableDeclarationStatement(variableDeclaration));
+        when(contextMock.getCoveringNode()).thenReturn(
+                TestUtils.putVariableIntoStubStatement(variableDeclaration));
 
         assertThat(testedClass.isApplicable(contextMock)).isFalse();
     }

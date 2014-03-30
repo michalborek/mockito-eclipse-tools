@@ -15,7 +15,13 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 public class TestUtils {
     public static final AST AST_INSTANCE = AST.newAST(AST.JLS4);
 
-    public static VariableDeclarationStatement createVariableDeclarationStatement(
+    /**
+     * Puts variable declaration into a method, that resides in stub class.
+     * 
+     * @param declaration
+     * @return class SomeClass { void method() { declaration; } }
+     */
+    public static VariableDeclarationStatement putVariableIntoStubStatement(
             final VariableDeclarationFragment declaration) {
         final VariableDeclarationStatement statement = AST_INSTANCE.newVariableDeclarationStatement(declaration);
         statement.setType(AST_INSTANCE.newSimpleType(AST_INSTANCE.newSimpleName("Object")));
@@ -30,8 +36,8 @@ public class TestUtils {
      * @param mockDeclaration
      */
     private static void createTypeStub(final VariableDeclarationStatement mockDeclaration) {
-        final FieldDeclaration fieldDeclaration = AST_INSTANCE.newFieldDeclaration(createVariableDeclaration("Object",
-                "conflicting"));
+        final FieldDeclaration fieldDeclaration = AST_INSTANCE
+                .newFieldDeclaration(createVariableDeclaration("conflicting"));
         final MethodDeclaration methodDeclaration = createMethodDeclaration(mockDeclaration);
         createTypeDeclaration(fieldDeclaration, methodDeclaration);
     }
@@ -39,13 +45,11 @@ public class TestUtils {
     /**
      * Creates variable declaration fragment with given type and variable name
      * 
-     * @param type
      * @param variableName
-     * @return Type variableName; 
-     * TODO type is not used, remove it and use it in
+     * @return Type variableName; TODO type is not used, remove it and use it in
      *         variable declaration statement
      */
-    public static VariableDeclarationFragment createVariableDeclaration(final String type, final String variableName) {
+    public static VariableDeclarationFragment createVariableDeclaration(final String variableName) {
         final VariableDeclarationFragment fragment = AST_INSTANCE.newVariableDeclarationFragment();
         fragment.setName(AST_INSTANCE.newSimpleName(variableName));
         return fragment;
@@ -60,6 +64,7 @@ public class TestUtils {
     @SuppressWarnings("unchecked")
     private static TypeDeclaration createTypeDeclaration(final BodyDeclaration... bodyDeclarations) {
         final TypeDeclaration typeDeclaration = AST_INSTANCE.newTypeDeclaration();
+        typeDeclaration.setName(AST_INSTANCE.newSimpleName("ClassToTest"));
 
         for (final BodyDeclaration bodyDeclaration : bodyDeclarations) {
             typeDeclaration.bodyDeclarations().add(bodyDeclaration);
@@ -127,8 +132,7 @@ public class TestUtils {
      */
     @SuppressWarnings("unchecked")
     public static ExpressionStatement createMethodInvocationExpression(final String variable,
-            final String invokedMethod,
-            final String... arguments) {
+            final String invokedMethod, final String... arguments) {
         final MethodInvocation methodInvocation = AST_INSTANCE.newMethodInvocation();
         methodInvocation.setName(AST_INSTANCE.newSimpleName(invokedMethod));
         methodInvocation.setExpression(AST_INSTANCE.newSimpleName(variable));

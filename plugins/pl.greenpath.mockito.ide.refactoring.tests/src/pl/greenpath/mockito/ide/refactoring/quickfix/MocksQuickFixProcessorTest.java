@@ -95,7 +95,7 @@ public class MocksQuickFixProcessorTest {
     }
 
     @Test
-    public void shouldHaveAssistsIfClassEndsWithTest() throws CoreException {
+    public void shouldHaveAssistsIfClassEndsWithTest() {
         final IType typeMock = mock(IType.class);
         when(typeMock.getElementName()).thenReturn("SomeTest");
         when(cuMock.findPrimaryType()).thenReturn(typeMock);
@@ -104,7 +104,7 @@ public class MocksQuickFixProcessorTest {
     }
 
     @Test
-    public void shouldNotHaveAssistIfClassNameNotEndsWithTest() throws CoreException {
+    public void shouldNotHaveAssistIfClassNameNotEndsWithTest() {
         final IType typeMock = mock(IType.class);
         when(typeMock.getElementName()).thenReturn("SomeClass");
         when(cuMock.findPrimaryType()).thenReturn(typeMock);
@@ -115,8 +115,8 @@ public class MocksQuickFixProcessorTest {
     @Test
     public void shouldReturnConvertToMockIfApplicable() throws CoreException {
         final MocksQuickFixProcessor processor = new MocksQuickFixProcessor();
-        final VariableDeclarationFragment fragment = TestUtils.createVariableDeclaration("Object", "someObject");
-        TestUtils.createVariableDeclarationStatement(fragment);
+        final VariableDeclarationFragment fragment = TestUtils.createVariableDeclaration("someObject");
+        TestUtils.putVariableIntoStubStatement(fragment);
         final IProblemLocation location = mock(IProblemLocation.class);
         when(location.getProblemId()).thenReturn(IProblem.UnresolvedVariable);
         when(location.getCoveredNode(astRoot)).thenReturn(fragment.getName());

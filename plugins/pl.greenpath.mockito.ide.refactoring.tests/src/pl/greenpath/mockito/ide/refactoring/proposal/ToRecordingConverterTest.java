@@ -4,10 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -31,7 +29,6 @@ public class ToRecordingConverterTest {
 
     @Mock
     private ICompilationUnit cu;
-    private final AST ast = TestUtils.AST_INSTANCE;
     private ImportRewrite importRewrite;
 
     @Before
@@ -40,25 +37,25 @@ public class ToRecordingConverterTest {
     }
 
     @Test
-    public void shouldConvertParameterlessMethodInvocationWithThenReturnStrategy() throws CoreException {
+    public void shouldConvertParameterlessMethodInvocationWithThenReturnStrategy() {
         checkConversion(new WhenThenReturnRecordingStrategy(),
                 "when(type.toString()).thenReturn();\n", TestUtils.createMethodInvocationExpression("type", "toString"));
     }
 
     @Test
-    public void shouldConvertMethodWithParametersInvocation() throws CoreException {
+    public void shouldConvertMethodWithParametersInvocation() {
         final ExpressionStatement expression = TestUtils.createMethodInvocationExpression("type", "equals", "x");
         checkConversion(new WhenThenReturnRecordingStrategy(), "when(type.equals(x)).thenReturn();\n", expression);
     }
 
     @Test
-    public void shouldConvertWithThenThrowStrategy() throws CoreException {
+    public void shouldConvertWithThenThrowStrategy() {
         checkConversion(new WhenThenThrowRecordingStrategy(),
                 "when(type.toString()).thenThrow();\n", TestUtils.createMethodInvocationExpression("type", "toString"));
     }
 
     private void checkConversion(final ConversionToRecordingStrategy strategy, final String resultStatement,
-            final ExpressionStatement selectedExpression) throws CoreException {
+            final ExpressionStatement selectedExpression) {
         final MethodDeclaration method = TestUtils.createMethodDeclaration("testMethod", selectedExpression);
 
         final ToRecordingConverter testedClass = new ToRecordingConverter(importRewrite,

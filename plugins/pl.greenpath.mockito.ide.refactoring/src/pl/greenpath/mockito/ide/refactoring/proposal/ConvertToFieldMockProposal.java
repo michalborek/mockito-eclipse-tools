@@ -50,7 +50,7 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
         return rewrite;
     }
 
-    private void removeStatement(final ASTRewrite rewrite) throws CoreException {
+    private void removeStatement(final ASTRewrite rewrite) {
         final ListRewrite list = rewrite.getListRewrite(methodBodyDeclaration.getBody(), Block.STATEMENTS_PROPERTY);
         list.remove(new AstResolver().findParentOfType(selectedStatement, Statement.class), null);
     }
@@ -67,7 +67,7 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
     private void addMissingFieldDeclaration(final ASTRewrite rewrite) {
         final VariableDeclarationFragment declaration =
                 ((VariableDeclarationFragment) selectedStatement.fragments().get(0));
-        final FieldDeclarationBuilder builder = new FieldDeclarationBuilder(declaration.getName(), astRoot, rewrite,
+        final FieldDeclarationBuilder builder = new FieldDeclarationBuilder(declaration.getName(), rewrite,
                 getImportRewrite())
                 .setType(selectedStatement.getType().resolveBinding())
                 .setModifiers(ModifierKeyword.PRIVATE_KEYWORD);
