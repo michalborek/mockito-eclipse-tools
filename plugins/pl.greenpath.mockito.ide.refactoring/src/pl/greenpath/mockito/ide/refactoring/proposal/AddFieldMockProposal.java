@@ -5,13 +5,14 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.text.java.correction.ASTRewriteCorrectionProposal;
 import org.eclipse.swt.graphics.Image;
 
 import pl.greenpath.mockito.ide.refactoring.PluginImages;
-import pl.greenpath.mockito.ide.refactoring.ast.BindingFinder;
+import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
 import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
 import pl.greenpath.mockito.ide.refactoring.builder.FieldDeclarationBuilder;
 import pl.greenpath.mockito.ide.refactoring.builder.TypeSingleMemberAnnotationBuilder;
@@ -24,13 +25,20 @@ public class AddFieldMockProposal extends ASTRewriteCorrectionProposal {
     private final SimpleName selectedNode;
     private final CompilationUnit astRoot;
     private final String mockitoAnnotation;
+    private final ContextBaseTypeFinder typeFinder;
 
     public AddFieldMockProposal(final ICompilationUnit cu, final SimpleName selectedNode,
-            final CompilationUnit astRoot, final String mockitoAnnotation) {
+            final CompilationUnit astRoot, final String mockitoAnnotation, final ContextBaseTypeFinder finder) {
         super("Create field " + mockitoAnnotation.toLowerCase(), cu, null, 0);
         this.selectedNode = selectedNode;
         this.astRoot = astRoot;
-        this.mockitoAnnotation = MOCKITO_PACKAGE + mockitoAnnotation;
+        this.mockitoAnnotation = mockitoAnnotation;
+        this.typeFinder = finder;
+    }
+
+    public AddFieldMockProposal(final ICompilationUnit cu, final SimpleName selectedNode,
+            final CompilationUnit astRoot, final String mockitoAnnotation) {
+        this(cu, selectedNode, astRoot, mockitoAnnotation, new ContextBaseTypeFinder());
     }
 
     @Override
@@ -43,18 +51,13 @@ public class AddFieldMockProposal extends ASTRewriteCorrectionProposal {
     }
 
     private void addRunWithAnnotation(final ASTRewrite rewrite) {
-        new TypeSingleMemberAnnotationBuilder(new BindingFinder().getParentTypeBinding(selectedNode), astRoot,
-                rewrite, getImportRewrite())
-                .setQualifiedName(RUN_WITH)
-                .setValue(MOCKITO_JUNIT_RUNNER)
-                .build();
+        new TypeSingleMemberAnnotationBuilder(new AstResolver().findParentOfType(selectedNode, TypeDeclaration.class),
+                astRoot, rewrite, getImportRewrite()).setQualifiedName(RUN_WITH).setValue(MOCKITO_JUNIT_RUNNER).build();
     }
 
     private void addMissingFieldDeclaration(final ASTRewrite rewrite) {
-        new FieldDeclarationBuilder(selectedNode, rewrite, getImportRewrite())
-                .setType(new ContextBaseTypeFinder().find(selectedNode))
-                .setModifiers(ModifierKeyword.PRIVATE_KEYWORD)
-                .setMarkerAnnotation(mockitoAnnotation)
+        new FieldDeclarationBuilder(selectedNode, rewrite, getImportRewrite()).setType(typeFinder.find(selectedNode))
+                .setModifiers(ModifierKeyword.PRIVATE_KEYWORD).setMarkerAnnotation(MOCKITO_PACKAGE + mockitoAnnotation)
                 .build();
     }
 
@@ -73,8 +76,7 @@ public class AddFieldMockProposal extends ASTRewriteCorrectionProposal {
 
     @Override
     public String toString() {
-        return "AddFieldMockProposal [selectedNode=" + selectedNode + ", mockitoAnnotation=" + mockitoAnnotation
-                + "]";
+        return "AddFieldMockProposal [selectedNode=" + selectedNode + ", mockitoAnnotation=" + mockitoAnnotation + "]";
     }
 
 }

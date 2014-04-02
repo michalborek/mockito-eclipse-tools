@@ -8,6 +8,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -19,7 +20,6 @@ import org.eclipse.swt.graphics.Image;
 
 import pl.greenpath.mockito.ide.refactoring.PluginImages;
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
-import pl.greenpath.mockito.ide.refactoring.ast.BindingFinder;
 import pl.greenpath.mockito.ide.refactoring.builder.FieldDeclarationBuilder;
 import pl.greenpath.mockito.ide.refactoring.builder.TypeSingleMemberAnnotationBuilder;
 
@@ -56,21 +56,17 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
     }
 
     private void addRunWithAnnotation(final ASTRewrite rewrite) {
-        new TypeSingleMemberAnnotationBuilder(new BindingFinder().getParentTypeBinding(methodBodyDeclaration),
-                astRoot,
-                rewrite, getImportRewrite())
-                .setQualifiedName(RUN_WITH)
-                .setValue(MOCKITO_JUNIT_RUNNER)
-                .build();
+        new TypeSingleMemberAnnotationBuilder(new AstResolver().findParentOfType(methodBodyDeclaration,
+                TypeDeclaration.class), astRoot, rewrite, getImportRewrite()).setQualifiedName(RUN_WITH)
+                .setValue(MOCKITO_JUNIT_RUNNER).build();
     }
 
     private void addMissingFieldDeclaration(final ASTRewrite rewrite) {
-        final VariableDeclarationFragment declaration =
-                ((VariableDeclarationFragment) selectedStatement.fragments().get(0));
+        final VariableDeclarationFragment declaration = ((VariableDeclarationFragment) selectedStatement.fragments()
+                .get(0));
         final FieldDeclarationBuilder builder = new FieldDeclarationBuilder(declaration.getName(), rewrite,
-                getImportRewrite())
-                .setType(selectedStatement.getType().resolveBinding())
-                .setModifiers(ModifierKeyword.PRIVATE_KEYWORD);
+                getImportRewrite()).setType(selectedStatement.getType().resolveBinding()).setModifiers(
+                ModifierKeyword.PRIVATE_KEYWORD);
 
         final MethodInvocation mockMethodInvocation = (MethodInvocation) declaration.getInitializer();
         final boolean addedNormal = considerAnnotationWithExtraInterfaces(builder, mockMethodInvocation);
