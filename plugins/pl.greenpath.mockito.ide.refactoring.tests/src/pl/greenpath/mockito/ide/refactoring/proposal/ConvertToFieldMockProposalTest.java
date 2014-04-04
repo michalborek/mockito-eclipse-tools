@@ -1,6 +1,8 @@
 package pl.greenpath.mockito.ide.refactoring.proposal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -10,18 +12,20 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.IAnnotationBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -29,6 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import pl.greenpath.mockito.ide.refactoring.TestUtils;
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
+import pl.greenpath.mockito.ide.refactoring.ast.BindingFinder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConvertToFieldMockProposalTest {
@@ -36,12 +41,28 @@ public class ConvertToFieldMockProposalTest {
     @Mock
     private ICompilationUnit cu;
 
+    @Mock
+    private BindingFinder bindingFinderMock;
+
     private CompilationUnit astRoot;
 
     @Before
     public void before() {
         astRoot = spy(TestUtils.AST_INSTANCE.newCompilationUnit());
         when(astRoot.getTypeRoot()).thenReturn(cu);
+        final ITypeBinding typeBindingMock = getTypeBindingMock();
+        when(bindingFinderMock.resolveBinding(any(Type.class))).thenReturn(typeBindingMock);
+    }
+
+    private ITypeBinding getTypeBindingMock() {
+        final ITypeBinding typeBindingMock = mock(ITypeBinding.class);
+        final ITypeBinding typeDeclarationMock = mock(ITypeBinding.class);
+        when(typeDeclarationMock.getQualifiedName()).thenReturn("pl.greenpath.test.FooBar");
+        when(typeBindingMock.getTypeDeclaration()).thenReturn(typeDeclarationMock);
+        when(typeBindingMock.getName()).thenReturn("FooBar");
+        when(typeBindingMock.getTypeArguments()).thenReturn(new ITypeBinding[0]);
+        when(typeBindingMock.getAnnotations()).thenReturn(new IAnnotationBinding[0]);
+        return typeBindingMock;
     }
 
     @Test
@@ -62,17 +83,17 @@ public class ConvertToFieldMockProposalTest {
     }
 
     @Test
-    @Ignore // TODO need to mock resolveBinding in addMissingFieldDeclarationClass
     public void shouldConvertLocalMockToFieldMock() throws CoreException {
-        final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("type");
+        final VariableDeclarationFragment variableDeclaration = TestUtils.createVariableDeclaration("fooMock");
         variableDeclaration.setInitializer(TestUtils.createMethodInvocation("mock", "Object"));
         final VariableDeclarationStatement statement = TestUtils.putVariableIntoStubStatement(variableDeclaration);
-        final ConvertToFieldMockProposal testedClass = new ConvertToFieldMockProposal(cu, statement, astRoot);
+        final ConvertToFieldMockProposal testedClass = new ConvertToFieldMockProposal(cu, statement, astRoot,
+                bindingFinderMock);
 
-        System.err.println(testedClass);
-
-        checkIfFieldWithMockHasBeenAdded(testedClass.getRewrite(),
-                new AstResolver().findParentOfType(statement, TypeDeclaration.class));
+        final ASTRewrite rewrite = testedClass.getRewrite();
+        final TypeDeclaration typeDeclaration = new AstResolver().findParentOfType(statement, TypeDeclaration.class);
+        checkIfFieldWithMockHasBeenAdded(rewrite, typeDeclaration);
+        checkIfRunWithAnnotationIsProperlyAdded(rewrite, typeDeclaration);
 
     }
 

@@ -20,6 +20,7 @@ import org.eclipse.swt.graphics.Image;
 
 import pl.greenpath.mockito.ide.refactoring.PluginImages;
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
+import pl.greenpath.mockito.ide.refactoring.ast.BindingFinder;
 import pl.greenpath.mockito.ide.refactoring.builder.FieldDeclarationBuilder;
 import pl.greenpath.mockito.ide.refactoring.builder.TypeSingleMemberAnnotationBuilder;
 
@@ -31,13 +32,20 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
     private final VariableDeclarationStatement selectedStatement;
     private final CompilationUnit astRoot;
     private final MethodDeclaration methodBodyDeclaration;
+    private final BindingFinder bindingFinder;
 
     public ConvertToFieldMockProposal(final ICompilationUnit cu, final VariableDeclarationStatement selectedNode,
             final CompilationUnit astRoot) {
+        this(cu, selectedNode, astRoot, new BindingFinder());
+    }
+
+    public ConvertToFieldMockProposal(final ICompilationUnit cu, final VariableDeclarationStatement selectedNode,
+            final CompilationUnit astRoot, final BindingFinder bindingFinder) {
         super("Convert to field mock", cu, null, 0);
         this.selectedStatement = selectedNode;
         this.astRoot = astRoot;
         this.methodBodyDeclaration = new AstResolver().findParentOfType(selectedNode, MethodDeclaration.class);
+        this.bindingFinder = bindingFinder;
     }
 
     @Override
@@ -65,7 +73,7 @@ public class ConvertToFieldMockProposal extends ASTRewriteCorrectionProposal {
         final VariableDeclarationFragment declaration = ((VariableDeclarationFragment) selectedStatement.fragments()
                 .get(0));
         final FieldDeclarationBuilder builder = new FieldDeclarationBuilder(declaration.getName(), rewrite,
-                getImportRewrite()).setType(selectedStatement.getType().resolveBinding()).setModifiers(
+                getImportRewrite()).setType(bindingFinder.resolveBinding(selectedStatement.getType())).setModifiers(
                 ModifierKeyword.PRIVATE_KEYWORD);
 
         final MethodInvocation mockMethodInvocation = (MethodInvocation) declaration.getInitializer();
