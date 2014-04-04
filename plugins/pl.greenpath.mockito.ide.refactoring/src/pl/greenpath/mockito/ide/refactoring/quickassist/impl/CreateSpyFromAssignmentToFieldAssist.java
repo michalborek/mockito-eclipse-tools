@@ -14,23 +14,35 @@ import org.eclipse.jdt.ui.text.java.IInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 
 import pl.greenpath.mockito.ide.refactoring.ast.AstResolver;
+import pl.greenpath.mockito.ide.refactoring.ast.BindingFinder;
 import pl.greenpath.mockito.ide.refactoring.proposal.AddLocalMockProposal;
 import pl.greenpath.mockito.ide.refactoring.proposal.strategy.SpyProposalStrategy;
 
-public class ConvertToSpyAssist implements IQuickFixAssist {
+public class CreateSpyFromAssignmentToFieldAssist implements IQuickFixAssist {
+
+    private final BindingFinder bindingFinder;
+
+    public CreateSpyFromAssignmentToFieldAssist() {
+        this(new BindingFinder());
+    }
+
+    CreateSpyFromAssignmentToFieldAssist(final BindingFinder bindingFinder) {
+        this.bindingFinder = bindingFinder;
+    }
 
     @Override
     public boolean isApplicable(final IInvocationContext context) {
         if (context.getCoveringNode().getNodeType() == ASTNode.SIMPLE_NAME) {
             final SimpleName simpleName = (SimpleName) context.getCoveringNode();
-            final IBinding resolveBinding = simpleName.resolveBinding();
+            final IBinding binding = bindingFinder.resolveBinding(simpleName);
 
-            if (resolveBinding == null || resolveBinding.getKind() != IBinding.VARIABLE) {
+            if (binding == null || binding.getKind() != IBinding.VARIABLE) {
                 return false;
             }
             if (!isInvokedInsideMethod(simpleName)) {
                 return false;
             }
+
             if (hasConflictingFieldWithName(simpleName, simpleName.getIdentifier() + "Spy")) {
                 return false;
             }

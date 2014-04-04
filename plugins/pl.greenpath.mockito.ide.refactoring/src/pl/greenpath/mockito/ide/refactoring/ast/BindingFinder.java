@@ -3,7 +3,9 @@ package pl.greenpath.mockito.ide.refactoring.ast;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Type;
 
 /**
@@ -28,5 +30,9 @@ public class BindingFinder {
 
     public ITypeBinding resolveBinding(final Type type) {
         return type.resolveBinding();
+    }
+
+    public IBinding resolveBinding(final SimpleName simpleName) {
+        return simpleName.resolveBinding();
     }
 }

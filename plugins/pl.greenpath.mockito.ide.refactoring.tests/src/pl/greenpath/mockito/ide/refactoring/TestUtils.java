@@ -1,12 +1,14 @@
 package pl.greenpath.mockito.ide.refactoring;
 
 import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleType;
+import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -79,7 +81,7 @@ public class TestUtils {
      * @return void method() { statement; }
      */
     @SuppressWarnings("unchecked")
-    private static MethodDeclaration createMethodDeclaration(final VariableDeclarationStatement statement) {
+    private static MethodDeclaration createMethodDeclaration(final Statement statement) {
         final MethodDeclaration newMethodDeclaration = AST_INSTANCE.newMethodDeclaration();
         newMethodDeclaration.setName(AST_INSTANCE.newSimpleName("method"));
         newMethodDeclaration.setBody(AST_INSTANCE.newBlock());
@@ -141,6 +143,20 @@ public class TestUtils {
         }
         final ExpressionStatement selected = AST_INSTANCE.newExpressionStatement(methodInvocation);
         return selected;
+    }
+
+    public static Assignment createAssignment(final String fieldType, final String fieldName, final String spyName) {
+        final FieldDeclaration fieldDeclaration = AST_INSTANCE
+                .newFieldDeclaration(createVariableDeclaration(fieldName));
+        fieldDeclaration.setType(AST_INSTANCE.newSimpleType(AST_INSTANCE.newSimpleName(fieldType)));
+        final Assignment assignment = AST_INSTANCE.newAssignment();
+        assignment.setLeftHandSide(AST_INSTANCE.newSimpleName(fieldName));
+        assignment.setRightHandSide(AST_INSTANCE.newSimpleName(spyName));
+
+        final MethodDeclaration methodDeclaration = createMethodDeclaration(AST_INSTANCE
+                .newExpressionStatement(assignment));
+        createTypeDeclaration(fieldDeclaration, methodDeclaration);
+        return assignment;
     }
 
 }

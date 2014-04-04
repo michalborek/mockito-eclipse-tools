@@ -11,7 +11,7 @@ import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IQuickAssistProcessor;
 
 import pl.greenpath.mockito.ide.refactoring.quickassist.impl.ConvertToFieldMockAssist;
-import pl.greenpath.mockito.ide.refactoring.quickassist.impl.ConvertToSpyAssist;
+import pl.greenpath.mockito.ide.refactoring.quickassist.impl.CreateSpyFromAssignmentToFieldAssist;
 import pl.greenpath.mockito.ide.refactoring.quickassist.impl.IQuickFixAssist;
 
 public class MocksQuickAssistProcessor implements IQuickAssistProcessor {
@@ -19,7 +19,7 @@ public class MocksQuickAssistProcessor implements IQuickAssistProcessor {
     private final List<IQuickFixAssist> assists;
 
     public MocksQuickAssistProcessor() {
-        this(Arrays.asList(new ConvertToFieldMockAssist(), new ConvertToSpyAssist()));
+        this(Arrays.asList(new ConvertToFieldMockAssist(), new CreateSpyFromAssignmentToFieldAssist()));
     }
 
     public MocksQuickAssistProcessor(final List<IQuickFixAssist> availableAssists) {
