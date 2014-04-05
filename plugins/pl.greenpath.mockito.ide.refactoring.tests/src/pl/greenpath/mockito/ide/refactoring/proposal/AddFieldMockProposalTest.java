@@ -93,7 +93,7 @@ public class AddFieldMockProposalTest {
         final ASTRewrite rewrite = testedClass.getRewrite();
         final TypeDeclaration typeDeclaration = new AstResolver().findParentOfType(statement, TypeDeclaration.class);
         ConversionsChecker.checkIfRunWithAnnotationIsProperlyAdded(rewrite, typeDeclaration);
-        ConversionsChecker.checkIfFieldWithMockHasBeenAdded(rewrite, typeDeclaration, "fooMock", "FooBar");
+        ConversionsChecker.checkIfFieldMockHasBeenAdded(rewrite, typeDeclaration, "fooMock", "FooBar");
     }
 
 
