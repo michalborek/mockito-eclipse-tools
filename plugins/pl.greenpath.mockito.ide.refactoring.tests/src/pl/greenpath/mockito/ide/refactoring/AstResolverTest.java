@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.zip.ZipException;
+import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -40,8 +40,8 @@ public class AstResolverTest {
     private AstResolver testedClass;
 
     @BeforeClass
-    public static void beforeClass() throws CoreException, InvocationTargetException, ZipException, IOException {
-        final String pluginPath = "test/resources/test-project.zip";
+    public static void beforeClass() throws CoreException, InvocationTargetException, IOException, URISyntaxException {
+        final String pluginPath = "/test/resources/test-project";
         final IJavaProject jproject = TestProjectHelper.importProject(pluginPath, PROJECT_NAME);
 
         final IPackageFragmentRoot sourceFolder = jproject.getPackageFragmentRoot(jproject.getResource().getProject()

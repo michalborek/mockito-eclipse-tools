@@ -60,7 +60,7 @@ public class AddLocalMockProposalTest {
 
     @BeforeClass
     public static void beforeClass() throws CoreException, InvocationTargetException, ZipException, IOException {
-        final String pluginPath = "test/resources/test-project.zip";
+        final String pluginPath = "/test/resources/test-project";
         final IJavaProject jproject = TestProjectHelper.importProject(pluginPath, PROJECT_NAME);
         final IPackageFragmentRoot sourceFolder = jproject.getPackageFragmentRoot(jproject.getResource().getProject()
                 .getFolder("src"));

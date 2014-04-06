@@ -129,7 +129,6 @@ public class ConvertToFieldMockProposalTest {
         name.setLiteralValue("someName");
         methodInvocation.arguments().add(name);
         
-        System.err.println(methodInvocation);
         variableDeclaration.setInitializer(methodInvocation);
         final VariableDeclarationStatement statement = TestUtils.putVariableIntoStubStatement(variableDeclaration);
         final ConvertToFieldMockProposal testedClass = new ConvertToFieldMockProposal(cu, statement, astRoot,
