@@ -1,7 +1,6 @@
 package pl.greenpath.mockito.ide.refactoring.builder;
 
 import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -12,7 +11,7 @@ import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 public class TypeSingleMemberAnnotationBuilder {
 
     private final ImportRewrite importRewrite;
-    private final TypeDeclaration typeBinding;
+    private final TypeDeclaration type;
     private final ASTRewrite rewrite;
     private final SingleMemberAnnotation annotation;
     private final AST ast;
@@ -20,7 +19,7 @@ public class TypeSingleMemberAnnotationBuilder {
     public TypeSingleMemberAnnotationBuilder(final TypeDeclaration typeDeclaration, final CompilationUnit astRoot,
             final ASTRewrite rewrite, final ImportRewrite importRewrite) {
         this.rewrite = rewrite;
-        this.typeBinding = typeDeclaration;
+        this.type = typeDeclaration;
         this.importRewrite = importRewrite;
         this.ast = astRoot.getAST();
         this.annotation = ast.newSingleMemberAnnotation();
@@ -44,14 +43,13 @@ public class TypeSingleMemberAnnotationBuilder {
 
     public void build() {
         if (!containsAnnotation(annotation)) {
-            final ASTNode typeNode = typeBinding;
-            rewrite.getListRewrite(typeNode, TypeDeclaration.MODIFIERS2_PROPERTY).insertFirst(annotation, null);
+            rewrite.getListRewrite(type, TypeDeclaration.MODIFIERS2_PROPERTY).insertFirst(annotation, null);
         }
     }
 
     private boolean containsAnnotation(final SingleMemberAnnotation annotation) {
         // TODO what about complex refactorings?
-        for (final Object modifier : typeBinding.modifiers()) {
+        for (final Object modifier : type.modifiers()) {
             if (modifier instanceof SingleMemberAnnotation) {
                 final SingleMemberAnnotation existingAnnotation = (SingleMemberAnnotation) modifier;
                 if (existingAnnotation.getTypeName().getFullyQualifiedName()
