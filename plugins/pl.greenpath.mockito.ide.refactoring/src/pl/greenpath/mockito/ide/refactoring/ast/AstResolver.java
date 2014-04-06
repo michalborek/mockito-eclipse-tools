@@ -24,12 +24,9 @@ public class AstResolver {
     }
 
     public ChildListPropertyDescriptor getBodyDeclarationsProperty(final ASTNode node) {
-        if (node instanceof AbstractTypeDeclaration) {
-            return ((AbstractTypeDeclaration) node).getBodyDeclarationsProperty();
-        }
         if (node instanceof AnonymousClassDeclaration) {
             return AnonymousClassDeclaration.BODY_DECLARATIONS_PROPERTY;
         }
-        throw new IllegalArgumentException("Only AbstractTypeDeclaration and AnonymousClassDeclaration allowed");
+        return ((AbstractTypeDeclaration) node).getBodyDeclarationsProperty();
     }
 }
