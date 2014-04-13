@@ -11,28 +11,34 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
-public class PluginImages {
+public final class PluginImages {
+
+    private PluginImages() {
+        imageRegistry.put(ISharedImages.IMG_FIELD_PRIVATE, DESC_FIELD_PRIVATE);
+        imageRegistry.put(ISharedImages.IMG_OBJS_LOCAL_VARIABLE, DESC_LOCAL_VARIABLE);
+    }
 
     private static final IPath ICONS_PATH = new Path("/icons");
-    private static final ImageRegistry IMAGE_REGISTRY = new ImageRegistry();
     private static final String NAME_PREFIX = "org.eclipse.jdt.ui.";
     private static final String T_OBJ = "obj16";
     public static final ImageDescriptor DESC_FIELD_PRIVATE = createManagedFromKey(T_OBJ,
             ISharedImages.IMG_FIELD_PRIVATE);
     public static final ImageDescriptor DESC_LOCAL_VARIABLE = createManagedFromKey(T_OBJ,
             ISharedImages.IMG_OBJS_LOCAL_VARIABLE);
+    private static final PluginImages INSTANCE = new PluginImages();
 
-    static {
-        IMAGE_REGISTRY.put(ISharedImages.IMG_FIELD_PRIVATE, DESC_FIELD_PRIVATE);
-        IMAGE_REGISTRY.put(ISharedImages.IMG_OBJS_LOCAL_VARIABLE, DESC_LOCAL_VARIABLE);
+    private final ImageRegistry imageRegistry = new ImageRegistry();
+
+    public static PluginImages getInstance() {
+        return INSTANCE;
     }
 
-    public static ImageRegistry getImageRegistry() {
-        return IMAGE_REGISTRY;
+    public ImageRegistry getImageRegistry() {
+        return imageRegistry;
     }
 
-    public static Image get(final String description) {
-        return IMAGE_REGISTRY.get(description);
+    public Image get(final String description) {
+        return imageRegistry.get(description);
     }
 
     private static ImageDescriptor createManagedFromKey(final String prefix, final String key) {

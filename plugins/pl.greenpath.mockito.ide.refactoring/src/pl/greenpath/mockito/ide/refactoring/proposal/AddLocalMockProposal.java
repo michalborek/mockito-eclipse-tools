@@ -42,7 +42,7 @@ public class AddLocalMockProposal extends ASTRewriteCorrectionProposal {
 
     @Override
     public Image getImage() {
-        return PluginImages.get(ISharedImages.IMG_OBJS_LOCAL_VARIABLE);
+        return PluginImages.getInstance().get(ISharedImages.IMG_OBJS_LOCAL_VARIABLE);
     }
 
     @Override

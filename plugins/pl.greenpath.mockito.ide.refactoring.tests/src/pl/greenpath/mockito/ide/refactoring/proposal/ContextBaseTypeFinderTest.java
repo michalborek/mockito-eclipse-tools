@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
@@ -21,6 +22,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -31,6 +33,7 @@ import org.junit.Test;
 
 import pl.greenpath.mockito.ide.refactoring.ASTTesting;
 import pl.greenpath.mockito.ide.refactoring.TestProjectHelper;
+import pl.greenpath.mockito.ide.refactoring.TestUtils;
 import pl.greenpath.mockito.ide.refactoring.ast.ContextBaseTypeFinder;
 
 public class ContextBaseTypeFinderTest {
@@ -139,5 +142,13 @@ public class ContextBaseTypeFinderTest {
         final ContextBaseTypeFinder finder = new ContextBaseTypeFinder();
 
         assertEquals("long", finder.find(testMockName).getQualifiedName());
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionForUnsupportedNode() {
+        final CatchClause catchClause = TestUtils.AST_INSTANCE.newCatchClause();
+        final SingleVariableDeclaration newSingleVariableDeclaration = TestUtils.AST_INSTANCE.newSingleVariableDeclaration();
+        catchClause.setException(newSingleVariableDeclaration);
+        new ContextBaseTypeFinder().find(newSingleVariableDeclaration);
     }
 }

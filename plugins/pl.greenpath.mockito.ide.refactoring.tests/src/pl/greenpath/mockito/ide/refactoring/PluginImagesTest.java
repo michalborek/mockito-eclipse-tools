@@ -8,8 +8,9 @@ public class PluginImagesTest {
 
     @Test
     public void shouldReuseSameInstance() {
-        assertThat(PluginImages.getImageRegistry()).isNotNull();
-        assertThat(PluginImages.getImageRegistry()).isSameAs(PluginImages.getImageRegistry());
+        assertThat(PluginImages.getInstance().getImageRegistry()).isNotNull();
+        assertThat(PluginImages.getInstance().getImageRegistry()).isSameAs(
+                PluginImages.getInstance().getImageRegistry());
     }
 
 }

@@ -71,7 +71,7 @@ public class AddFieldMockProposal extends ASTRewriteCorrectionProposal {
 
     @Override
     public Image getImage() {
-        return PluginImages.get(ISharedImages.IMG_FIELD_PRIVATE);
+        return PluginImages.getInstance().get(ISharedImages.IMG_FIELD_PRIVATE);
     }
 
     @Override

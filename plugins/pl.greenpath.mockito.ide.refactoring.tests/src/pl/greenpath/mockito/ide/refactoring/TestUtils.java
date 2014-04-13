@@ -1,10 +1,13 @@
 package pl.greenpath.mockito.ide.refactoring;
 
+import java.util.List;
+
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleType;
@@ -64,7 +67,7 @@ public class TestUtils {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private static TypeDeclaration createTypeDeclaration(final BodyDeclaration... bodyDeclarations) {
+    public static TypeDeclaration createTypeDeclaration(final BodyDeclaration... bodyDeclarations) {
         final TypeDeclaration typeDeclaration = AST_INSTANCE.newTypeDeclaration();
         typeDeclaration.setName(AST_INSTANCE.newSimpleName("ClassToTest"));
 
@@ -81,7 +84,7 @@ public class TestUtils {
      * @return void method() { statement; }
      */
     @SuppressWarnings("unchecked")
-    private static MethodDeclaration createMethodDeclaration(final Statement statement) {
+    public static MethodDeclaration createMethodDeclaration(final Statement statement) {
         final MethodDeclaration newMethodDeclaration = AST_INSTANCE.newMethodDeclaration();
         newMethodDeclaration.setName(AST_INSTANCE.newSimpleName("method"));
         newMethodDeclaration.setBody(AST_INSTANCE.newBlock());
@@ -159,4 +162,18 @@ public class TestUtils {
         return assignment;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static FieldDeclaration createFieldWithMockAnnotation(final String type, final String name) {
+        final VariableDeclarationFragment fragment = AST_INSTANCE.newVariableDeclarationFragment();
+        fragment.setName(AST_INSTANCE.newSimpleName(name));
+        final FieldDeclaration fieldDeclaration = AST_INSTANCE.newFieldDeclaration(fragment);
+        fieldDeclaration.setType(AST_INSTANCE.newSimpleType(AST_INSTANCE.newSimpleName(type)));
+        final List nodeList = (List) fieldDeclaration.getStructuralProperty(FieldDeclaration.MODIFIERS2_PROPERTY);
+        final MarkerAnnotation annotation = AST_INSTANCE.newMarkerAnnotation();
+        annotation.setTypeName(AST_INSTANCE.newName("Mock"));
+        nodeList.add(annotation);
+
+        return fieldDeclaration;
+
+    }
 }

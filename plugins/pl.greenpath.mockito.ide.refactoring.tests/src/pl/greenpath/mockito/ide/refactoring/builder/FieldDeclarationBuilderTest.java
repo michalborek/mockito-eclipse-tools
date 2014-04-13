@@ -1,6 +1,8 @@
 package pl.greenpath.mockito.ide.refactoring.builder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -9,13 +11,17 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import org.junit.Before;
@@ -40,7 +46,7 @@ public class FieldDeclarationBuilderTest {
 
     private ImportRewrite importRewrite;
 
-    private FieldDeclarationBuilder fieldDeclarationBuilder;
+    private FieldDeclarationBuilder testedClass;
 
     private TypeDeclaration type;
 
@@ -53,7 +59,7 @@ public class FieldDeclarationBuilderTest {
         final VariableDeclarationFragment fragment = TestUtils.createVariableDeclaration("type");
         TestUtils.putVariableIntoStubStatement(fragment);
 
-        fieldDeclarationBuilder = new FieldDeclarationBuilder(fragment.getName(), rewrite, importRewrite);
+        testedClass = new FieldDeclarationBuilder(fragment.getName(), rewrite, importRewrite);
         type = getTypeDeclaration(fragment);
     }
 
@@ -77,8 +83,8 @@ public class FieldDeclarationBuilderTest {
     public void shouldConvertToMockWithExtraInterfaces() {
         final TypeLiteral typeLiteral = ast.newTypeLiteral();
         typeLiteral.setType(ast.newSimpleType(ast.newSimpleName("List")));
-        fieldDeclarationBuilder.setAnnotationWithExtraInterfaces("org.mockito.Mock", typeLiteral);
-        fieldDeclarationBuilder.build();
+        testedClass.setAnnotationWithExtraInterfaces("org.mockito.Mock", typeLiteral);
+        testedClass.build();
 
         final List typeRewrittenList = rewrite.getListRewrite(type, type.getBodyDeclarationsProperty())
                 .getRewrittenList();
@@ -94,7 +100,7 @@ public class FieldDeclarationBuilderTest {
 
     @SuppressWarnings({ "rawtypes" })
     private void checkConversionToField(final String mockAnnotation, final ModifierKeyword... modifiers) {
-        fieldDeclarationBuilder.setMarkerAnnotation("org.mockito." + mockAnnotation).setModifiers(modifiers).build();
+        testedClass.setMarkerAnnotation("org.mockito." + mockAnnotation).setModifiers(modifiers).build();
 
         final List typeRewrittenList = rewrite.getListRewrite(type, type.getBodyDeclarationsProperty())
                 .getRewrittenList();
@@ -110,7 +116,44 @@ public class FieldDeclarationBuilderTest {
         assertThat(importRewrite.getAddedImports()).contains("org.mockito." + mockAnnotation);
     }
 
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void shouldInsertAfterAnyOtherMockThatAlreadyExists() {
+
+        final FieldDeclaration fieldDeclaration = TestUtils.createFieldWithMockAnnotation("Object", "foo");
+
+        final VariableDeclarationFragment fragment = TestUtils.createVariableDeclaration("type");
+        final VariableDeclarationStatement statement = TestUtils.AST_INSTANCE.newVariableDeclarationStatement(fragment);
+        statement.setType(TestUtils.AST_INSTANCE.newSimpleType(TestUtils.AST_INSTANCE.newSimpleName("Object")));
+        final MethodDeclaration methodDeclaration = TestUtils.createMethodDeclaration(statement);
+        final TypeDeclaration parentType = TestUtils.createTypeDeclaration(fieldDeclaration, methodDeclaration);
+
+        final FieldDeclarationBuilder builder = new FieldDeclarationBuilder(fragment.getName(), rewrite, importRewrite);
+        builder.setMarkerAnnotation("org.mockito.Mock").setType(getTypeBindingMock()).build();
+
+        final List typeRewrittenList = rewrite.getListRewrite(parentType, parentType.getBodyDeclarationsProperty())
+                .getRewrittenList();
+
+        final FieldDeclaration rewrittenField2 = (FieldDeclaration) typeRewrittenList.get(1);
+
+        final Object annotation = rewrite.getListRewrite(rewrittenField2, FieldDeclaration.MODIFIERS2_PROPERTY)
+                .getRewrittenList().get(0);
+        assertThat(annotation).isInstanceOf(MarkerAnnotation.class);
+        assertThat(((SimpleName)((MarkerAnnotation) annotation).getTypeName()).getFullyQualifiedName()).isEqualTo("Mock");
+        assertThat(rewrittenField2.toString()).isEqualTo("TestedClass type;\n");
+    }
+
     private TypeDeclaration getTypeDeclaration(final VariableDeclarationFragment fragment) {
         return new AstResolver().findParentOfType(fragment.getName(), TypeDeclaration.class);
+    }
+    
+    private ITypeBinding getTypeBindingMock() {
+        final ITypeBinding typeBindingMock = mock(ITypeBinding.class);
+        final ITypeBinding typeDeclarationMock = mock(ITypeBinding.class);
+        when(typeDeclarationMock.getQualifiedName()).thenReturn("pl.greenpath.test.TestedClass");
+        when(typeBindingMock.getTypeDeclaration()).thenReturn(typeDeclarationMock);
+        when(typeBindingMock.getName()).thenReturn("TestedClass");
+        when(typeBindingMock.getTypeArguments()).thenReturn(new ITypeBinding[0]);
+        return typeBindingMock;
     }
 }
