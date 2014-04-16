@@ -163,17 +163,21 @@ public class TestUtils {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static FieldDeclaration createFieldWithMockAnnotation(final String type, final String name) {
+    public static FieldDeclaration createFieldWithAnnotation(final String type, final String name, String annotationName) {
+        final FieldDeclaration fieldDeclaration = createField(type, name);
+        final List nodeList = (List) fieldDeclaration.getStructuralProperty(FieldDeclaration.MODIFIERS2_PROPERTY);
+        final MarkerAnnotation annotation = AST_INSTANCE.newMarkerAnnotation();
+        annotation.setTypeName(AST_INSTANCE.newName(annotationName));
+        nodeList.add(annotation);
+
+        return fieldDeclaration;
+    }
+
+    public static FieldDeclaration createField(final String type, final String name) {
         final VariableDeclarationFragment fragment = AST_INSTANCE.newVariableDeclarationFragment();
         fragment.setName(AST_INSTANCE.newSimpleName(name));
         final FieldDeclaration fieldDeclaration = AST_INSTANCE.newFieldDeclaration(fragment);
         fieldDeclaration.setType(AST_INSTANCE.newSimpleType(AST_INSTANCE.newSimpleName(type)));
-        final List nodeList = (List) fieldDeclaration.getStructuralProperty(FieldDeclaration.MODIFIERS2_PROPERTY);
-        final MarkerAnnotation annotation = AST_INSTANCE.newMarkerAnnotation();
-        annotation.setTypeName(AST_INSTANCE.newName("Mock"));
-        nodeList.add(annotation);
-
         return fieldDeclaration;
-
     }
 }

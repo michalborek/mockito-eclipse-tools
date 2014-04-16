@@ -118,35 +118,64 @@ public class FieldDeclarationBuilderTest {
 
     @SuppressWarnings("rawtypes")
     @Test
-    public void shouldInsertAfterAnyOtherMockThatAlreadyExists() {
+    public void shouldAtTheBeginningIfNoFieldWithMockAnnotationExists() {
 
-        final FieldDeclaration fieldDeclaration = TestUtils.createFieldWithMockAnnotation("Object", "foo");
+        final FieldDeclaration fieldDeclaration = TestUtils.createFieldWithAnnotation("Object", "foo", "Spy");
 
         final VariableDeclarationFragment fragment = TestUtils.createVariableDeclaration("type");
         final VariableDeclarationStatement statement = TestUtils.AST_INSTANCE.newVariableDeclarationStatement(fragment);
         statement.setType(TestUtils.AST_INSTANCE.newSimpleType(TestUtils.AST_INSTANCE.newSimpleName("Object")));
         final MethodDeclaration methodDeclaration = TestUtils.createMethodDeclaration(statement);
         final TypeDeclaration parentType = TestUtils.createTypeDeclaration(fieldDeclaration, methodDeclaration);
-
+        
         final FieldDeclarationBuilder builder = new FieldDeclarationBuilder(fragment.getName(), rewrite, importRewrite);
         builder.setMarkerAnnotation("org.mockito.Mock").setType(getTypeBindingMock()).build();
-
+        
         final List typeRewrittenList = rewrite.getListRewrite(parentType, parentType.getBodyDeclarationsProperty())
                 .getRewrittenList();
-
-        final FieldDeclaration rewrittenField2 = (FieldDeclaration) typeRewrittenList.get(1);
-
-        final Object annotation = rewrite.getListRewrite(rewrittenField2, FieldDeclaration.MODIFIERS2_PROPERTY)
+        
+        final FieldDeclaration rewrittenField = (FieldDeclaration) typeRewrittenList.get(0);
+        
+        final Object annotation = rewrite.getListRewrite(rewrittenField, FieldDeclaration.MODIFIERS2_PROPERTY)
                 .getRewrittenList().get(0);
         assertThat(annotation).isInstanceOf(MarkerAnnotation.class);
-        assertThat(((SimpleName)((MarkerAnnotation) annotation).getTypeName()).getFullyQualifiedName()).isEqualTo("Mock");
-        assertThat(rewrittenField2.toString()).isEqualTo("TestedClass type;\n");
+        assertThat(((SimpleName) ((MarkerAnnotation) annotation).getTypeName()).getFullyQualifiedName()).isEqualTo(
+                "Mock");
+        assertThat(rewrittenField.toString()).isEqualTo("TestedClass type;\n");
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void shouldInsertAfterExistingFieldMock() {
+        
+        final FieldDeclaration fieldDeclaration = TestUtils.createFieldWithAnnotation("Object", "foo", "Mock");
+        
+        final VariableDeclarationFragment fragment = TestUtils.createVariableDeclaration("type");
+        final VariableDeclarationStatement statement = TestUtils.AST_INSTANCE.newVariableDeclarationStatement(fragment);
+        statement.setType(TestUtils.AST_INSTANCE.newSimpleType(TestUtils.AST_INSTANCE.newSimpleName("Object")));
+        final MethodDeclaration methodDeclaration = TestUtils.createMethodDeclaration(statement);
+        final TypeDeclaration parentType = TestUtils.createTypeDeclaration(fieldDeclaration, methodDeclaration);
+        
+        final FieldDeclarationBuilder builder = new FieldDeclarationBuilder(fragment.getName(), rewrite, importRewrite);
+        builder.setMarkerAnnotation("org.mockito.Mock").setType(getTypeBindingMock()).build();
+        
+        final List typeRewrittenList = rewrite.getListRewrite(parentType, parentType.getBodyDeclarationsProperty())
+                .getRewrittenList();
+        
+        final FieldDeclaration rewrittenField = (FieldDeclaration) typeRewrittenList.get(1);
+        
+        final Object annotation = rewrite.getListRewrite(rewrittenField, FieldDeclaration.MODIFIERS2_PROPERTY)
+                .getRewrittenList().get(0);
+        assertThat(annotation).isInstanceOf(MarkerAnnotation.class);
+        assertThat(((SimpleName) ((MarkerAnnotation) annotation).getTypeName()).getFullyQualifiedName()).isEqualTo(
+                "Mock");
+        assertThat(rewrittenField.toString()).isEqualTo("TestedClass type;\n");
     }
 
     private TypeDeclaration getTypeDeclaration(final VariableDeclarationFragment fragment) {
         return new AstResolver().findParentOfType(fragment.getName(), TypeDeclaration.class);
     }
-    
+
     private ITypeBinding getTypeBindingMock() {
         final ITypeBinding typeBindingMock = mock(ITypeBinding.class);
         final ITypeBinding typeDeclarationMock = mock(ITypeBinding.class);
